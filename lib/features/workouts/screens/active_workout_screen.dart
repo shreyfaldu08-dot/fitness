@@ -8,6 +8,8 @@ import '../../../core/constants/app_typography.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/widgets/fitora_button.dart';
+import '../../../core/widgets/fitora_muscle_badge.dart';
+import '../../../core/widgets/fitora_muscle_illustration.dart';
 import '../../../data/models/workout_plan.dart';
 import '../../../data/models/workout_session.dart';
 import '../../../data/seed/seed_exercises.dart';
@@ -315,33 +317,33 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Container(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: AppSpacing.roundedMd,
                   border: Border.all(color: AppColors.border),
+                  boxShadow: AppColors.cardShadow,
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.workoutAccent.withValues(alpha: 0.12),
-                        borderRadius: AppSpacing.roundedSm,
-                      ),
-                      child: const Icon(Icons.fitness_center_rounded, color: AppColors.workoutAccent, size: 24),
+                    // Dynamic Anatomical Target Highlight
+                    FitoraMuscleIllustration(
+                      muscle: activeExName,
+                      width: 56,
+                      height: 70,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(activeExName, style: AppTypography.labelLarge),
-                          const SizedBox(height: 2),
+                          Text(activeExName, style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 4),
+                          FitoraMuscleBadge(muscle: activeExName),
+                          const SizedBox(height: 4),
                           Text(
-                            'Maintain rigid posture, controlled 3s tempo, full range.',
-                            style: AppTypography.bodySmall.copyWith(fontSize: 11),
+                            'Maintain rigid posture, controlled 3s tempo, full range of motion.',
+                            style: AppTypography.bodySmall.copyWith(fontSize: 11, color: AppColors.textSecondary),
                           ),
                         ],
                       ),

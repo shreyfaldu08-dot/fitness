@@ -13,6 +13,7 @@ import '../../../core/widgets/fitora_water_bottle.dart';
 import '../../../core/widgets/fitora_macro_gauge.dart';
 import '../../../core/widgets/fitora_week_streak.dart';
 import '../../../core/widgets/fitora_muscle_badge.dart';
+import '../../../core/widgets/fitora_muscle_illustration.dart';
 import '../../../data/models/workout_plan.dart';
 
 class HomeDashboardScreen extends ConsumerWidget {
@@ -393,26 +394,44 @@ class HomeDashboardScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(plan.title, style: AppTypography.headingSmall),
-          const SizedBox(height: 6),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.timer_outlined, size: 14, color: AppColors.textSecondary),
-              const SizedBox(width: 4),
-              Text('${plan.estimatedDurationMinutes} mins', style: AppTypography.bodySmall),
-              const SizedBox(width: 12),
-              const Icon(Icons.fitness_center_rounded, size: 14, color: AppColors.textSecondary),
-              const SizedBox(width: 4),
-              Text('${plan.exercises.length} exercises', style: AppTypography.bodySmall),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              FitoraMuscleBadge(muscle: plan.category.toUpperCase()),
-              const FitoraMuscleBadge(muscle: 'Hypertrophy', isSecondary: true),
+              FitoraMuscleIllustration(
+                muscle: plan.category,
+                width: 58,
+                height: 72,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(plan.title, style: AppTypography.headingSmall),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(Icons.timer_outlined, size: 14, color: AppColors.textSecondary),
+                        const SizedBox(width: 4),
+                        Text('${plan.estimatedDurationMinutes} mins', style: AppTypography.bodySmall),
+                        const SizedBox(width: 10),
+                        const Icon(Icons.fitness_center_rounded, size: 14, color: AppColors.textSecondary),
+                        const SizedBox(width: 4),
+                        Text('${plan.exercises.length} exercises', style: AppTypography.bodySmall),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: [
+                        FitoraMuscleBadge(muscle: plan.category.toUpperCase()),
+                        const FitoraMuscleBadge(muscle: 'Hypertrophy', isSecondary: true),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),

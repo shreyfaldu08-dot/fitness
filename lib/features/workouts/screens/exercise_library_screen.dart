@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/fitora_card.dart';
 import '../../../core/widgets/fitora_chip.dart';
 import '../../../core/widgets/fitora_muscle_badge.dart';
+import '../../../core/widgets/fitora_muscle_illustration.dart';
 import '../../../data/models/exercise.dart';
 
 class ExerciseLibraryScreen extends ConsumerStatefulWidget {
@@ -155,23 +155,16 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
   }
 
   Widget _buildExerciseTile(BuildContext context, Exercise exercise) {
-    final muscleColor = FitoraMuscleBadge.getMuscleColor(exercise.targetMuscle);
-    final muscleIcon = FitoraMuscleBadge.getMuscleIcon(exercise.targetMuscle);
-
     return FitoraCard(
       onTap: () => context.push('/exercise-detail', extra: exercise),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       child: Row(
         children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: muscleColor.withValues(alpha: 0.12),
-              borderRadius: AppSpacing.roundedSm,
-              border: Border.all(color: muscleColor.withValues(alpha: 0.25)),
-            ),
-            child: Icon(muscleIcon, color: muscleColor, size: 26),
+          // Anatomical Body Target Illustration
+          FitoraMuscleIllustration(
+            muscle: exercise.targetMuscle,
+            width: 54,
+            height: 68,
           ),
           const SizedBox(width: 14),
           Expanded(

@@ -6,6 +6,7 @@ import '../../../core/constants/app_typography.dart';
 import '../../../core/widgets/fitora_card.dart';
 import '../../../core/widgets/fitora_button.dart';
 import '../../../core/widgets/fitora_muscle_badge.dart';
+import '../../../core/widgets/fitora_muscle_illustration.dart';
 import '../../../data/models/exercise.dart';
 import '../../../data/models/workout_plan.dart';
 
@@ -82,6 +83,15 @@ class ExerciseDetailScreen extends StatelessWidget {
                     ],
                   ],
                 ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+
+              // Full Dual-View Anatomical Muscle Highlight Map
+              FitoraAnatomyCard(
+                primaryMuscle: ex.targetMuscle,
+                secondaryMuscles: ex.secondaryMuscles,
+                exerciseName: ex.name,
+                equipment: ex.equipment,
               ),
               const SizedBox(height: AppSpacing.lg),
 

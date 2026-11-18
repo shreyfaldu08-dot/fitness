@@ -8,8 +8,8 @@ import '../../../core/constants/app_typography.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/widgets/fitora_button.dart';
-import '../../../core/widgets/fitora_muscle_badge.dart';
-import '../../../core/widgets/fitora_muscle_illustration.dart';
+import '../../../core/widgets/fitora_exercise_visual_tile.dart';
+import '../../../data/models/exercise.dart';
 import '../../../data/models/workout_plan.dart';
 import '../../../data/models/workout_session.dart';
 import '../../../data/seed/seed_exercises.dart';
@@ -316,40 +316,30 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
             // Exercise Demonstration & Instruction Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: AppSpacing.roundedMd,
-                  border: Border.all(color: AppColors.border),
-                  boxShadow: AppColors.cardShadow,
-                ),
-                child: Row(
-                  children: [
-                    // Dynamic Anatomical Target Highlight
-                    FitoraMuscleIllustration(
-                      muscle: activeExName,
-                      width: 56,
-                      height: 70,
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(activeExName, style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 4),
-                          FitoraMuscleBadge(muscle: activeExName),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Maintain rigid posture, controlled 3s tempo, full range of motion.',
-                            style: AppTypography.bodySmall.copyWith(fontSize: 11, color: AppColors.textSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              child: Builder(
+                builder: (context) {
+                  Exercise? matchEx;
+                  for (final e in SeedExercises.list) {
+                    if (e.name.toLowerCase() == activeExName.toLowerCase()) {
+                      matchEx = e;
+                      break;
+                    }
+                  }
+                  final safeEx = matchEx ??
+                      Exercise(
+                        id: 'ex_active',
+                        name: activeExName,
+                        category: 'full_body',
+                        targetMuscle: activeExName,
+                        equipment: 'Barbell',
+                        instructions: 'Maintain rigid posture, controlled 3s tempo, full range of motion.',
+                        safetyGuidance: 'Keep neutral spine and breathe steadily.',
+                      );
+                  return FitoraExerciseVisualTile(
+                    exercise: safeEx,
+                    onTap: () => context.push('/exercise-detail', extra: safeEx),
+                  );
+                },
               ),
             ),
 

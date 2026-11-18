@@ -379,15 +379,24 @@ class HomeDashboardScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.workoutAccent.withValues(alpha: 0.12),
+                  color: plan.goalBadgeColor.withValues(alpha: 0.12),
                   borderRadius: AppSpacing.roundedSm,
+                  border: Border.all(color: plan.goalBadgeColor.withValues(alpha: 0.3)),
                 ),
-                child: Text(
-                  'TODAY\'S TRAINING',
-                  style: AppTypography.labelSmall.copyWith(
-                    color: AppColors.workoutAccent,
-                    fontWeight: FontWeight.w700,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(plan.goalIcon, size: 13, color: plan.goalBadgeColor),
+                    const SizedBox(width: 5),
+                    Text(
+                      plan.goalDisplayName.toUpperCase(),
+                      style: AppTypography.labelSmall.copyWith(
+                        color: plan.goalBadgeColor,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               FitoraDifficultyIndicator(difficulty: plan.difficulty),

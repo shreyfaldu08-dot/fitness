@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import '../../core/constants/app_colors.dart';
 import 'exercise.dart';
 
 class PlanExercise {
@@ -63,6 +65,117 @@ class PlanExercise {
   }
 }
 
+/// Professional Day Schedule in a Weekly Workout Split
+class WorkoutDaySchedule {
+  final String dayOfWeek; // 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'
+  final String dayName; // 'Monday', 'Tuesday', etc.
+  final String title; // 'Push Day: Chest, Shoulders & Triceps'
+  final String targetMuscles; // 'Chest, Anterior Deltoids, Triceps'
+  final bool isRestDay;
+  final int estimatedMinutes;
+  final String intensity; // 'High', 'Moderate', 'Light', 'Recovery'
+  final List<PlanExercise> exercises;
+  final String coachTip;
+  final String cardioGuidance;
+
+  const WorkoutDaySchedule({
+    required this.dayOfWeek,
+    required this.dayName,
+    required this.title,
+    required this.targetMuscles,
+    this.isRestDay = false,
+    this.estimatedMinutes = 45,
+    this.intensity = 'Moderate',
+    this.exercises = const [],
+    this.coachTip = 'Focus on controlled form and full range of motion.',
+    this.cardioGuidance = 'Optional: 15-20 min Zone 2 cooldown walk.',
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'day_of_week': dayOfWeek,
+      'day_name': dayName,
+      'title': title,
+      'target_muscles': targetMuscles,
+      'is_rest_day': isRestDay,
+      'estimated_minutes': estimatedMinutes,
+      'intensity': intensity,
+      'exercises': exercises.map((e) => e.toJson()).toList(),
+      'coach_tip': coachTip,
+      'cardio_guidance': cardioGuidance,
+    };
+  }
+
+  factory WorkoutDaySchedule.fromJson(Map<String, dynamic> json, [List<Exercise>? catalog]) {
+    final rawExercises = (json['exercises'] as List<dynamic>?) ?? [];
+    final parsed = rawExercises.map((e) {
+      final map = e as Map<String, dynamic>;
+      final exId = map['exercise_id'] as String? ?? '';
+      Exercise? found;
+      if (catalog != null) {
+        try {
+          found = catalog.firstWhere((x) => x.id == exId);
+        } catch (_) {}
+      }
+      return PlanExercise.fromJson(map, found);
+    }).toList();
+
+    return WorkoutDaySchedule(
+      dayOfWeek: json['day_of_week'] as String? ?? 'MON',
+      dayName: json['day_name'] as String? ?? 'Monday',
+      title: json['title'] as String? ?? 'Training Session',
+      targetMuscles: json['target_muscles'] as String? ?? 'Full Body',
+      isRestDay: json['is_rest_day'] as bool? ?? false,
+      estimatedMinutes: json['estimated_minutes'] as int? ?? 45,
+      intensity: json['intensity'] as String? ?? 'Moderate',
+      exercises: parsed,
+      coachTip: json['coach_tip'] as String? ?? 'Maintain consistent tempo.',
+      cardioGuidance: json['cardio_guidance'] as String? ?? '20 min brisk walking.',
+    );
+  }
+}
+
+/// S&C Professional Advisory Protocol
+class ProfessionalCoachingAdvice {
+  final String targetRpe; // e.g. "RPE 8.0 - 9.0 (1-2 Reps in Reserve)"
+  final String restProtocol; // e.g. "90 - 120s between compound movements"
+  final String progressionRule; // e.g. "Double Progression: Hit top of rep target on all sets, then add 2.5 kg"
+  final String nutritionSynergy; // e.g. "+350 to +500 kcal surplus • 1.8-2.2g/kg protein"
+  final String cardioGuidance; // e.g. "8,000-10,000 daily steps + 20 min Zone 2 twice weekly"
+  final String coachTip; // e.g. "Hypertrophy requires consistent mechanical tension and progressive overload."
+
+  const ProfessionalCoachingAdvice({
+    this.targetRpe = 'RPE 7.5 - 8.5 (1-2 Reps in Reserve)',
+    this.restProtocol = '60 - 90s between sets',
+    this.progressionRule = 'Add 1 rep each session or increase weight by 2.5% once upper rep limit is achieved.',
+    this.nutritionSynergy = 'Adequate protein (1.8-2.2g/kg bodyweight) and hydrated glycogen stores.',
+    this.cardioGuidance = '8,000-10,000 daily steps for cardiovascular baseline.',
+    this.coachTip = 'Emphasize controlled eccentric tempo (3 seconds down) for maximal muscle stimulus.',
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'target_rpe': targetRpe,
+      'rest_protocol': restProtocol,
+      'progression_rule': progressionRule,
+      'nutrition_synergy': nutritionSynergy,
+      'cardio_guidance': cardioGuidance,
+      'coach_tip': coachTip,
+    };
+  }
+
+  factory ProfessionalCoachingAdvice.fromJson(Map<String, dynamic> json) {
+    return ProfessionalCoachingAdvice(
+      targetRpe: json['target_rpe'] as String? ?? 'RPE 7.5 - 8.5',
+      restProtocol: json['rest_protocol'] as String? ?? '60 - 90s',
+      progressionRule: json['progression_rule'] as String? ?? 'Progressive overload.',
+      nutritionSynergy: json['nutrition_synergy'] as String? ?? 'Balanced nutrition.',
+      cardioGuidance: json['cardio_guidance'] as String? ?? '8,000 daily steps.',
+      coachTip: json['coach_tip'] as String? ?? 'Focus on form.',
+    );
+  }
+}
+
 class WorkoutPlan {
   final String id;
   final String? userId; // null if predefined template
@@ -75,6 +188,13 @@ class WorkoutPlan {
   final bool isTemplate;
   final DateTime? createdAt;
 
+  // Professional Goal & Weekly Split Extensions
+  final String goalType; // 'muscle_gain', 'fat_loss', 'strength', 'recomposition', 'calisthenics'
+  final String goalDisplayName;
+  final String splitType; // e.g. '5-Day Push/Pull/Legs', '4-Day Metabolic Density'
+  final List<WorkoutDaySchedule> weeklySchedule;
+  final ProfessionalCoachingAdvice coachingAdvice;
+
   const WorkoutPlan({
     required this.id,
     this.userId,
@@ -86,6 +206,11 @@ class WorkoutPlan {
     required this.exercises,
     this.isTemplate = false,
     this.createdAt,
+    this.goalType = 'muscle_gain',
+    this.goalDisplayName = 'Muscle Hypertrophy & Mass',
+    this.splitType = '4-Day Split Routine',
+    this.weeklySchedule = const [],
+    this.coachingAdvice = const ProfessionalCoachingAdvice(),
   });
 
   String get category {
@@ -101,6 +226,40 @@ class WorkoutPlan {
 
   String get difficulty => level;
 
+  Color get goalBadgeColor {
+    switch (goalType.toLowerCase()) {
+      case 'muscle_gain':
+        return const Color(0xFF8B5CF6); // Vibrant Purple / Violet
+      case 'fat_loss':
+        return const Color(0xFFEF4444); // Vivid Coral Red
+      case 'strength':
+        return const Color(0xFFF59E0B); // Electric Amber
+      case 'recomposition':
+        return const Color(0xFF10B981); // Emerald Green
+      case 'calisthenics':
+        return const Color(0xFF06B6D4); // Cyan / Ocean Blue
+      default:
+        return AppColors.primary;
+    }
+  }
+
+  IconData get goalIcon {
+    switch (goalType.toLowerCase()) {
+      case 'muscle_gain':
+        return Icons.fitness_center_rounded;
+      case 'fat_loss':
+        return Icons.local_fire_department_rounded;
+      case 'strength':
+        return Icons.offline_bolt_rounded;
+      case 'recomposition':
+        return Icons.auto_awesome_rounded;
+      case 'calisthenics':
+        return Icons.accessibility_new_rounded;
+      default:
+        return Icons.sports_gymnastics_rounded;
+    }
+  }
+
   WorkoutPlan copyWith({
     String? id,
     String? userId,
@@ -112,6 +271,11 @@ class WorkoutPlan {
     List<PlanExercise>? exercises,
     bool? isTemplate,
     DateTime? createdAt,
+    String? goalType,
+    String? goalDisplayName,
+    String? splitType,
+    List<WorkoutDaySchedule>? weeklySchedule,
+    ProfessionalCoachingAdvice? coachingAdvice,
   }) {
     return WorkoutPlan(
       id: id ?? this.id,
@@ -124,6 +288,11 @@ class WorkoutPlan {
       exercises: exercises ?? this.exercises,
       isTemplate: isTemplate ?? this.isTemplate,
       createdAt: createdAt ?? this.createdAt,
+      goalType: goalType ?? this.goalType,
+      goalDisplayName: goalDisplayName ?? this.goalDisplayName,
+      splitType: splitType ?? this.splitType,
+      weeklySchedule: weeklySchedule ?? this.weeklySchedule,
+      coachingAdvice: coachingAdvice ?? this.coachingAdvice,
     );
   }
 
@@ -139,6 +308,11 @@ class WorkoutPlan {
       'exercises': exercises.map((e) => e.toJson()).toList(),
       'is_template': isTemplate,
       'created_at': createdAt?.toIso8601String(),
+      'goal_type': goalType,
+      'goal_display_name': goalDisplayName,
+      'split_type': splitType,
+      'weekly_schedule': weeklySchedule.map((s) => s.toJson()).toList(),
+      'coaching_advice': coachingAdvice.toJson(),
     };
   }
 
@@ -156,6 +330,16 @@ class WorkoutPlan {
       return PlanExercise.fromJson(map, found);
     }).toList();
 
+    final rawSchedule = (json['weekly_schedule'] as List<dynamic>?) ?? [];
+    final parsedSchedule = rawSchedule
+        .map((s) => WorkoutDaySchedule.fromJson(s as Map<String, dynamic>, catalogExercises))
+        .toList();
+
+    final rawCoaching = json['coaching_advice'];
+    final parsedCoaching = rawCoaching is Map<String, dynamic>
+        ? ProfessionalCoachingAdvice.fromJson(rawCoaching)
+        : const ProfessionalCoachingAdvice();
+
     return WorkoutPlan(
       id: json['id'] as String? ?? '',
       userId: json['user_id'] as String?,
@@ -167,6 +351,11 @@ class WorkoutPlan {
       exercises: parsedExercises,
       isTemplate: json['is_template'] as bool? ?? false,
       createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'] as String) : null,
+      goalType: json['goal_type'] as String? ?? 'muscle_gain',
+      goalDisplayName: json['goal_display_name'] as String? ?? 'Muscle Hypertrophy & Mass',
+      splitType: json['split_type'] as String? ?? '4-Day Split Routine',
+      weeklySchedule: parsedSchedule,
+      coachingAdvice: parsedCoaching,
     );
   }
 }

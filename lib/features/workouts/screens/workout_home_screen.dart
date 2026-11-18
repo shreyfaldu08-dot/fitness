@@ -8,17 +8,38 @@ import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/fitora_card.dart';
 import '../../../core/widgets/fitora_button.dart';
 import '../../../core/widgets/fitora_muscle_badge.dart';
-import '../../../core/widgets/fitora_muscle_illustration.dart';
+import '../../../core/widgets/fitora_exercise_visual_tile.dart';
+import '../../../core/widgets/fitora_weekly_split_view.dart';
 import '../../../data/models/workout_plan.dart';
 
-class WorkoutHomeScreen extends ConsumerWidget {
+class WorkoutHomeScreen extends ConsumerStatefulWidget {
   const WorkoutHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WorkoutHomeScreen> createState() => _WorkoutHomeScreenState();
+}
+
+class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
+  String _selectedGoal = 'all';
+
+  final List<Map<String, dynamic>> _goalFilters = [
+    {'id': 'all', 'label': 'All Goals', 'icon': Icons.apps_rounded, 'color': AppColors.primary},
+    {'id': 'muscle_gain', 'label': 'Muscle Gain', 'icon': Icons.fitness_center_rounded, 'color': Color(0xFF8B5CF6)},
+    {'id': 'fat_loss', 'label': 'Fat Loss & Shred', 'icon': Icons.local_fire_department_rounded, 'color': Color(0xFFEF4444)},
+    {'id': 'strength', 'label': 'Pure Strength', 'icon': Icons.offline_bolt_rounded, 'color': Color(0xFFF59E0B)},
+    {'id': 'recomposition', 'label': 'Body Recomp', 'icon': Icons.auto_awesome_rounded, 'color': Color(0xFF10B981)},
+    {'id': 'calisthenics', 'label': 'Home Bodyweight', 'icon': Icons.accessibility_new_rounded, 'color': Color(0xFF06B6D4)},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
     final workoutRepo = ref.watch(workoutRepositoryProvider);
-    final plans = workoutRepo.getAllPlans();
+    final allPlans = workoutRepo.getAllPlans();
     final sessions = workoutRepo.getWorkoutSessions();
+
+    final filteredPlans = _selectedGoal == 'all'
+        ? allPlans
+        : allPlans.where((p) => p.goalType.toLowerCase() == _selectedGoal.toLowerCase()).toList();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -73,7 +94,7 @@ class WorkoutHomeScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Log weights, track rest intervals, and break personal records.',
+                      'Targeted hypertrophy splits, metabolic fat loss circuits, and strength protocols.',
                       style: AppTypography.bodySmall.copyWith(color: Colors.white.withValues(alpha: 0.85)),
                     ),
                     const SizedBox(height: AppSpacing.lg),
@@ -114,26 +135,119 @@ class WorkoutHomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // Workout Templates
+              // SECTION HEADER: GOAL-BASED TRAINING PLANS
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Training Plans & Splits', style: AppTypography.headingSmall),
-                  Text('${plans.length} available', style: AppTypography.labelSmall),
+                  Text('${filteredPlans.length} programs', style: AppTypography.labelSmall),
                 ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Evidence-based routines structured by primary fitness goals and weekly splits.',
+                style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: AppSpacing.md),
 
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: plans.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final plan = plans[index];
-                  return _buildPlanCard(context, plan);
-                },
+              // INTERACTIVE GOAL FILTER BAR
+              SizedBox(
+                height: 38,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _goalFilters.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (context, i) {
+                    final filter = _goalFilters[i];
+                    final isSelected = _selectedGoal == filter['id'];
+                    final color = filter['color'] as Color;
+
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedGoal = filter['id'] as String;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? color : Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isSelected ? color : AppColors.border,
+                            width: isSelected ? 1.5 : 1,
+                          ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: color.withValues(alpha: 0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              filter['icon'] as IconData,
+                              size: 15,
+                              color: isSelected ? Colors.white : AppColors.textSecondary,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              filter['label'] as String,
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : AppColors.textPrimary,
+                                fontSize: 12,
+                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
+              const SizedBox(height: AppSpacing.lg),
+
+              // LIST OF TRAINING PLANS
+              if (filteredPlans.isEmpty)
+                Container(
+                  padding: const EdgeInsets.all(32),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: AppSpacing.roundedMd,
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.fitness_center_outlined, size: 48, color: AppColors.textMuted),
+                      const SizedBox(height: 12),
+                      Text('No programs found for this goal', style: AppTypography.headingSmall),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Select another goal filter or build your own custom plan.',
+                        style: AppTypography.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              else
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: filteredPlans.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 16),
+                  itemBuilder: (context, index) {
+                    final plan = filteredPlans[index];
+                    return _buildPlanCard(context, plan);
+                  },
+                ),
               const SizedBox(height: AppSpacing.xl),
 
               // Recent History Snippet
@@ -224,59 +338,178 @@ class WorkoutHomeScreen extends ConsumerWidget {
   }
 
   Widget _buildPlanCard(BuildContext context, WorkoutPlan plan) {
+    final goalColor = plan.goalBadgeColor;
+
     return FitoraCard(
+      padding: const EdgeInsets.all(18),
+      border: Border.all(color: goalColor.withValues(alpha: 0.3), width: 1.2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Top Header: Goal Badge + Difficulty
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              FitoraMuscleBadge(muscle: plan.category.toUpperCase()),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: goalColor.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: goalColor.withValues(alpha: 0.4)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(plan.goalIcon, size: 14, color: goalColor),
+                    const SizedBox(width: 6),
+                    Text(
+                      plan.goalDisplayName.toUpperCase(),
+                      style: TextStyle(
+                        color: goalColor,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               FitoraDifficultyIndicator(difficulty: plan.difficulty),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(plan.title, style: AppTypography.headingSmall),
-          const SizedBox(height: 4),
+          const SizedBox(height: 12),
+
+          // Plan Title & Split Type Subtitle
+          Text(plan.title, style: AppTypography.headingSmall.copyWith(fontSize: 18)),
+          const SizedBox(height: 2),
+          Text(
+            plan.splitType,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: goalColor,
+            ),
+          ),
+          const SizedBox(height: 6),
+
           Text(
             plan.description,
-            style: AppTypography.bodySmall,
+            style: AppTypography.bodySmall.copyWith(height: 1.35),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
+
+          // Schedule Details Row
           Row(
             children: [
               const Icon(Icons.calendar_today_rounded, size: 13, color: AppColors.textSecondary),
               const SizedBox(width: 4),
               Text('${plan.daysPerWeek} days/wk', style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary)),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               const Icon(Icons.timer_outlined, size: 13, color: AppColors.textSecondary),
               const SizedBox(width: 4),
               Text('~${plan.estimatedDurationMinutes}m', style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary)),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               const Icon(Icons.fitness_center_rounded, size: 13, color: AppColors.textSecondary),
               const SizedBox(width: 4),
               Text('${plan.exercises.length} movements', style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary)),
             ],
           ),
+          const SizedBox(height: 14),
+
+          // 7-DAY WEEKLY SPLIT PREVIEW STRIP
+          if (plan.weeklySchedule.isNotEmpty) ...[
+            FitoraWeeklySplitView(plan: plan, isCompact: true),
+            const SizedBox(height: 14),
+          ],
+
+          // S&C COACH ADVICE SNIPPET
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceMuted,
+              borderRadius: AppSpacing.roundedMd,
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.psychology_rounded, size: 18, color: goalColor),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "COACH'S PROTOCOL",
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: goalColor,
+                              letterSpacing: 0.6,
+                            ),
+                          ),
+                          Text(
+                            plan.coachingAdvice.targetRpe,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        plan.coachingAdvice.nutritionSynergy,
+                        style: AppTypography.bodySmall.copyWith(fontSize: 11, color: AppColors.textSecondary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: AppSpacing.md),
+
+          // Action Buttons: View Split & Start
           Row(
             children: [
               Expanded(
                 child: OutlinedButton(
                   onPressed: () {
-                    // Preview exercises in bottom sheet
                     _showPlanExercisesSheet(context, plan);
                   },
-                  child: Text('View ${plan.exercises.length} Exercises'),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: goalColor),
+                    foregroundColor: goalColor,
+                    padding: const EdgeInsets.symmetric(vertical: 11),
+                  ),
+                  child: const Text(
+                    'View Weekly Split',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: ElevatedButton(
                   onPressed: () => context.push('/active-workout', extra: plan),
-                  child: const Text('Start Routine'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: goalColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 11),
+                  ),
+                  child: const Text(
+                    'Start Routine',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
                 ),
               ),
             ],
@@ -290,146 +523,164 @@ class WorkoutHomeScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.65,
-          maxChildSize: 0.9,
-          minChildSize: 0.4,
-          expand: false,
-          builder: (_, controller) {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppColors.border,
-                        borderRadius: BorderRadius.circular(2),
+        return DefaultTabController(
+          length: 2,
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.88,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Handle bar
+                const SizedBox(height: 12),
+                Center(
+                  child: Container(
+                    width: 44,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppColors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Sheet Header
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: plan.goalBadgeColor.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                plan.goalDisplayName.toUpperCase(),
+                                style: TextStyle(
+                                  color: plan.goalBadgeColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(plan.title, style: AppTypography.headingSmall),
+                          ],
+                        ),
                       ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        onPressed: () => Navigator.pop(ctx),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Tab Bar: 7-Day Weekly Split vs Session Movements
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceMuted,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: TabBar(
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      indicator: BoxDecoration(
+                        color: plan.goalBadgeColor,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      labelColor: Colors.white,
+                      unselectedLabelColor: AppColors.textSecondary,
+                      labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                      tabs: const [
+                        Tab(text: '7-Day Weekly Split'),
+                        Tab(text: 'All Movements (3D Scan)'),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(plan.title, style: AppTypography.headingSmall),
-                  const SizedBox(height: 4),
-                  Text('${plan.exercises.length} exercises scheduled in this session', style: AppTypography.bodySmall),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: ListView.separated(
-                      controller: controller,
-                      itemCount: plan.exercises.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (c, i) {
-                        final ex = plan.exercises[i];
-                        final name = ex.exercise?.name ?? 'Exercise';
-                        final muscle = ex.exercise?.targetMuscle ?? plan.category;
-                        final secondary = ex.exercise?.secondaryMuscles ?? [];
+                ),
+                const SizedBox(height: 12),
 
-                        return InkWell(
-                          onTap: () {
-                            if (ex.exercise != null) {
-                              context.push('/exercise-detail', extra: ex.exercise);
-                            }
-                          },
-                          borderRadius: AppSpacing.roundedMd,
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: AppSpacing.roundedMd,
-                              border: Border.all(color: AppColors.border),
+                // Tab Views
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      // TAB 1: Complete 7-Day Weekly Split Calendar View
+                      SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            FitoraWeeklySplitView(plan: plan),
+                            const SizedBox(height: 24),
+                          ],
+                        ),
+                      ),
+
+                      // TAB 2: All Plan Exercises with Dual Movement Photo & 3D Anatomy
+                      SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${plan.exercises.length} Core Exercises Scheduled',
+                              style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.w800),
                             ),
-                            child: Row(
-                              children: [
-                                // Step # and Anatomical Muscle Illustration
-                                Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    FitoraMuscleIllustration(
-                                      muscle: muscle,
-                                      width: 54,
-                                      height: 66,
-                                    ),
-                                    Positioned(
-                                      top: -4,
-                                      left: -4,
-                                      child: Container(
-                                        width: 20,
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primary,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.white, width: 1.5),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            '${i + 1}',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(width: 12),
-
-                                // Exercise details
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(name, style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.bold)),
-                                      const SizedBox(height: 4),
-                                      Wrap(
-                                        spacing: 4,
-                                        runSpacing: 4,
-                                        children: [
-                                          FitoraMuscleBadge(muscle: muscle),
-                                          if (secondary.isNotEmpty)
-                                            FitoraMuscleBadge(muscle: secondary.first, isSecondary: true),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '${ex.targetSets} sets × ${ex.targetReps} reps • ${ex.restSeconds}s rest',
-                                        style: AppTypography.bodySmall.copyWith(fontSize: 11, color: AppColors.textSecondary),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                // Target Weight
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surfaceMuted,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    '${ex.defaultWeightKg} kg',
-                                    style: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.w800, color: AppColors.textPrimary),
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                const Icon(Icons.chevron_right_rounded, size: 18, color: AppColors.textMuted),
-                              ],
+                            const SizedBox(height: 4),
+                            Text(
+                              'Tap any movement to inspect full muscle scan & execution cues.',
+                              style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                            const SizedBox(height: 12),
+
+                            ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: plan.exercises.length,
+                              separatorBuilder: (_, __) => const SizedBox(height: 8),
+                              itemBuilder: (c, i) {
+                                final ex = plan.exercises[i];
+                                return FitoraExerciseVisualTile(
+                                  planExercise: ex,
+                                  index: i + 1,
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 24),
+
+                            FitoraButton(
+                              label: 'Start Routine Now',
+                              icon: const Icon(Icons.play_arrow_rounded, color: Colors.white),
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                context.push('/active-workout', extra: plan);
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            );
-          },
+                ),
+              ],
+            ),
+          ),
         );
       },
     );

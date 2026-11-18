@@ -4,10 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/providers/app_providers.dart';
-import '../../../core/widgets/fitora_card.dart';
 import '../../../core/widgets/fitora_chip.dart';
-import '../../../core/widgets/fitora_muscle_badge.dart';
-import '../../../core/widgets/fitora_muscle_illustration.dart';
+import '../../../core/widgets/fitora_exercise_visual_tile.dart';
 import '../../../data/models/exercise.dart';
 
 class ExerciseLibraryScreen extends ConsumerStatefulWidget {
@@ -139,10 +137,14 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                   return ListView.separated(
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                     itemCount: exercises.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, __) => const SizedBox(height: 4),
                     itemBuilder: (context, index) {
                       final exercise = exercises[index];
-                      return _buildExerciseTile(context, exercise);
+                      return FitoraExerciseVisualTile(
+                        exercise: exercise,
+                        index: index + 1,
+                        onTap: () => context.push('/exercise-detail', extra: exercise),
+                      );
                     },
                   );
                 },
@@ -150,54 +152,6 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildExerciseTile(BuildContext context, Exercise exercise) {
-    return FitoraCard(
-      onTap: () => context.push('/exercise-detail', extra: exercise),
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        children: [
-          // Anatomical Body Target Illustration
-          FitoraMuscleIllustration(
-            muscle: exercise.targetMuscle,
-            width: 54,
-            height: 68,
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(exercise.name, style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 6),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
-                  children: [
-                    FitoraMuscleBadge(muscle: exercise.targetMuscle),
-                    FitoraDifficultyIndicator(difficulty: exercise.difficulty),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(Icons.fitness_center_rounded, size: 12, color: AppColors.textMuted),
-                    const SizedBox(width: 4),
-                    Text(exercise.equipment, style: AppTypography.labelSmall.copyWith(fontSize: 11, color: AppColors.textMuted)),
-                    const SizedBox(width: 10),
-                    const Icon(Icons.timer_outlined, size: 12, color: AppColors.textMuted),
-                    const SizedBox(width: 4),
-                    Text('${exercise.restSeconds}s rest', style: AppTypography.labelSmall.copyWith(fontSize: 11, color: AppColors.textMuted)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted, size: 22),
-        ],
       ),
     );
   }

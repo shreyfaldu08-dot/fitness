@@ -10,6 +10,7 @@ import '../../../core/widgets/fitora_button.dart';
 import '../../../core/widgets/fitora_card.dart';
 import '../../../core/widgets/fitora_chip.dart';
 import '../../../core/widgets/fitora_text_field.dart';
+import '../../../core/widgets/fitora_exercise_visual_tile.dart';
 import '../../../data/models/workout_plan.dart';
 import '../../../data/seed/seed_exercises.dart';
 
@@ -99,22 +100,14 @@ class _WorkoutPlanBuilderScreenState extends ConsumerState<WorkoutPlanBuilderScr
                 Expanded(
                   child: ListView.separated(
                     controller: controller,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     itemCount: SeedExercises.list.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    separatorBuilder: (_, __) => const SizedBox(height: 6),
                     itemBuilder: (c, i) {
                       final ex = SeedExercises.list[i];
-                      return ListTile(
-                        leading: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(Icons.fitness_center_rounded, color: AppColors.primary, size: 20),
-                        ),
-                        title: Text(ex.name, style: AppTypography.labelLarge),
-                        subtitle: Text('${ex.categoryDisplayName} • ${ex.targetMuscle}'),
-                        trailing: const Icon(Icons.add_circle_outline_rounded, color: AppColors.primary),
+                      return FitoraExerciseVisualTile(
+                        exercise: ex,
+                        index: i + 1,
                         onTap: () {
                           Navigator.pop(ctx);
                           setState(() {

@@ -7,6 +7,7 @@ import '../../../core/constants/app_typography.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/fitora_card.dart';
 import '../../../core/widgets/fitora_chip.dart';
+import '../../../core/widgets/fitora_muscle_badge.dart';
 import '../../../data/models/exercise.dart';
 
 class ExerciseLibraryScreen extends ConsumerStatefulWidget {
@@ -154,37 +155,49 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
   }
 
   Widget _buildExerciseTile(BuildContext context, Exercise exercise) {
+    final muscleColor = FitoraMuscleBadge.getMuscleColor(exercise.targetMuscle);
+    final muscleIcon = FitoraMuscleBadge.getMuscleIcon(exercise.targetMuscle);
+
     return FitoraCard(
       onTap: () => context.push('/exercise-detail', extra: exercise),
       padding: const EdgeInsets.all(14),
       child: Row(
         children: [
           Container(
-            width: 50,
-            height: 50,
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
-              color: AppColors.primaryLight,
+              color: muscleColor.withValues(alpha: 0.12),
               borderRadius: AppSpacing.roundedSm,
+              border: Border.all(color: muscleColor.withValues(alpha: 0.25)),
             ),
-            child: const Icon(Icons.fitness_center_rounded, color: AppColors.primary, size: 24),
+            child: Icon(muscleIcon, color: muscleColor, size: 26),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(exercise.name, style: AppTypography.labelLarge),
-                const SizedBox(height: 2),
-                Text(
-                  exercise.targetMuscle,
-                  style: AppTypography.bodySmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.w500),
+                Text(exercise.name, style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: [
+                    FitoraMuscleBadge(muscle: exercise.targetMuscle),
+                    FitoraDifficultyIndicator(difficulty: exercise.difficulty),
+                  ],
                 ),
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    _buildMiniBadge(exercise.categoryDisplayName, AppColors.textSecondary),
-                    const SizedBox(width: 6),
-                    _buildMiniBadge(exercise.difficulty.toUpperCase(), AppColors.workoutAccent),
+                    const Icon(Icons.fitness_center_rounded, size: 12, color: AppColors.textMuted),
+                    const SizedBox(width: 4),
+                    Text(exercise.equipment, style: AppTypography.labelSmall.copyWith(fontSize: 11, color: AppColors.textMuted)),
+                    const SizedBox(width: 10),
+                    const Icon(Icons.timer_outlined, size: 12, color: AppColors.textMuted),
+                    const SizedBox(width: 4),
+                    Text('${exercise.restSeconds}s rest', style: AppTypography.labelSmall.copyWith(fontSize: 11, color: AppColors.textMuted)),
                   ],
                 ),
               ],
@@ -192,20 +205,6 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
           ),
           const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted, size: 22),
         ],
-      ),
-    );
-  }
-
-  Widget _buildMiniBadge(String text, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        text,
-        style: AppTypography.labelSmall.copyWith(color: color, fontSize: 10, fontWeight: FontWeight.w600),
       ),
     );
   }

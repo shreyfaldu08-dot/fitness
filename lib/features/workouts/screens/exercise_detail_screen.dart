@@ -5,6 +5,7 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/widgets/fitora_card.dart';
 import '../../../core/widgets/fitora_button.dart';
+import '../../../core/widgets/fitora_muscle_badge.dart';
 import '../../../data/models/exercise.dart';
 import '../../../data/models/workout_plan.dart';
 
@@ -52,40 +53,30 @@ class ExerciseDetailScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildTag(ex.difficulty.toUpperCase(), AppColors.primary),
-                        const SizedBox(width: 8),
+                        FitoraDifficultyIndicator(difficulty: ex.difficulty),
                         _buildTag(ex.equipment.toUpperCase(), AppColors.workoutAccent),
                       ],
                     ),
                     const SizedBox(height: 12),
                     Text(ex.name, style: AppTypography.headingLarge),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
-                        const Icon(Icons.my_location_rounded, size: 16, color: AppColors.primary),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            'Target: ${ex.targetMuscle}',
-                            style: AppTypography.labelMedium.copyWith(color: AppColors.primary),
-                          ),
-                        ),
+                        const Text('Primary Target: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                        FitoraMuscleBadge(muscle: ex.targetMuscle),
                       ],
                     ),
                     if (ex.secondaryMuscles.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      const SizedBox(height: 8),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 6,
+                        runSpacing: 4,
                         children: [
-                          const Icon(Icons.add_circle_outline, size: 16, color: AppColors.textSecondary),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              'Secondary: ${ex.secondaryMuscles.join(", ")}',
-                              style: AppTypography.bodySmall,
-                            ),
-                          ),
+                          const Text('Secondary: ', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                          ...ex.secondaryMuscles.map((sec) => FitoraMuscleBadge(muscle: sec, isSecondary: true)),
                         ],
                       ),
                     ],

@@ -12,6 +12,7 @@ import '../../../core/utils/date_formatter.dart';
 import '../../../core/widgets/fitora_card.dart';
 import '../../../core/widgets/fitora_button.dart';
 import '../../../core/widgets/fitora_text_field.dart';
+import '../../../core/widgets/fitora_bmi_gauge.dart';
 import '../../../data/models/body_measurement.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
@@ -251,6 +252,10 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                   ),
                 ],
               ),
+              const SizedBox(height: AppSpacing.md),
+
+              // Visual BMI Spectrum Gauge
+              FitoraBmiGauge(bmi: bmi),
               const SizedBox(height: AppSpacing.lg),
 
               // Weight Trend Chart Header & Filters

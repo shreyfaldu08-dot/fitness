@@ -7,7 +7,7 @@ import '../../../core/constants/app_typography.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/widgets/fitora_card.dart';
-import '../../../core/widgets/fitora_progress_ring.dart';
+import '../../../core/widgets/fitora_macro_gauge.dart';
 import '../../../data/models/food_log.dart';
 
 class NutritionHomeScreen extends ConsumerWidget {
@@ -190,78 +190,40 @@ class NutritionHomeScreen extends ConsumerWidget {
     return FitoraCard(
       child: Column(
         children: [
-          Row(
-            children: [
-              FitoraProgressRing(
-                progress: ratio,
-                size: 90,
-                strokeWidth: 9,
-                progressColor: AppColors.calorieAccent,
-                centerChild: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('$remainingCalories', style: AppTypography.statDisplay.copyWith(fontSize: 22)),
-                    Text('kcal left', style: AppTypography.labelSmall.copyWith(fontSize: 10)),
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSpacing.lg),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('$totalCalories consumed', style: AppTypography.labelLarge),
-                        Text('$targetCalories target', style: AppTypography.bodySmall),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    _buildMacroLinearRow('Protein', protein, targetProtein, AppColors.proteinAccent),
-                    const SizedBox(height: 6),
-                    _buildMacroLinearRow('Carbs', carbs, targetCarbs, AppColors.carbAccent),
-                    const SizedBox(height: 6),
-                    _buildMacroLinearRow('Fats', fat, targetFat, AppColors.fatAccent),
-                  ],
-                ),
-              ),
-            ],
+          FitoraMacroGauge(
+            caloriesConsumed: totalCalories,
+            calorieTarget: targetCalories,
+            proteinConsumed: protein,
+            proteinTarget: targetProtein,
+            carbsConsumed: carbs,
+            carbsTarget: targetCarbs,
+            fatConsumed: fat,
+            fatTarget: targetFat,
           ),
           const Divider(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Text('Fiber: ${fiber}g / 35g', style: AppTypography.bodySmall),
+              Row(
+                children: [
+                  const Icon(Icons.grass_rounded, size: 14, color: Color(0xFF10B981)),
+                  const SizedBox(width: 4),
+                  Text('Dietary Fiber: ${fiber}g / 35g', style: AppTypography.bodySmall),
+                ],
+              ),
               Container(width: 1, height: 14, color: AppColors.border),
-              Text('Calorie Adherence: ${(ratio * 100).round()}%',
-                  style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+              Row(
+                children: [
+                  const Icon(Icons.verified_rounded, size: 14, color: AppColors.primary),
+                  const SizedBox(width: 4),
+                  Text('Adherence: ${(ratio * 100).round()}%',
+                      style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+                ],
+              ),
             ],
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildMacroLinearRow(String name, int current, int target, Color color) {
-    final frac = target > 0 ? (current / target).clamp(0.0, 1.0) : 0.0;
-    return Row(
-      children: [
-        SizedBox(width: 48, child: Text(name, style: AppTypography.labelSmall)),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: frac,
-              backgroundColor: AppColors.surfaceMuted,
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-              minHeight: 5,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text('$current/${target}g', style: AppTypography.labelSmall.copyWith(fontWeight: FontWeight.bold)),
-      ],
     );
   }
 
@@ -332,15 +294,21 @@ class NutritionHomeScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(log.foodName, style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-                          const SizedBox(height: 2),
-                          Text(
-                            '${log.quantity}x ${log.servingUnit} • ${log.protein.round()}g P • ${log.carbs.round()}g C • ${log.fat.round()}g F',
-                            style: AppTypography.bodySmall.copyWith(fontSize: 11),
+                          const SizedBox(height: 3),
+                          Wrap(
+                            spacing: 4,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text('${log.quantity}x ${log.servingUnit}', style: AppTypography.bodySmall.copyWith(fontSize: 11)),
+                              _buildMiniMacroChip('${log.protein.round()}g P', AppColors.proteinAccent),
+                              _buildMiniMacroChip('${log.carbs.round()}g C', AppColors.carbAccent),
+                              _buildMiniMacroChip('${log.fat.round()}g F', AppColors.fatAccent),
+                            ],
                           ),
                         ],
                       ),
                     ),
-                    Text('${log.calories.round()} kcal', style: AppTypography.labelMedium),
+                    Text('${log.calories.round()} kcal', style: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.bold)),
                     IconButton(
                       icon: const Icon(Icons.close_rounded, size: 16, color: AppColors.textMuted),
                       onPressed: () => onDelete(log.id),
@@ -351,6 +319,24 @@ class NutritionHomeScreen extends ConsumerWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildMiniMacroChip(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: AppTypography.labelSmall.copyWith(
+          color: color,
+          fontSize: 9.5,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

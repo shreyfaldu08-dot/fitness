@@ -88,6 +88,19 @@ class WorkoutPlan {
     this.createdAt,
   });
 
+  String get category {
+    final lower = title.toLowerCase();
+    if (lower.contains('chest') || lower.contains('push')) return 'Chest';
+    if (lower.contains('back') || lower.contains('pull')) return 'Back';
+    if (lower.contains('leg') || lower.contains('lower')) return 'Legs';
+    if (lower.contains('shoulder')) return 'Shoulders';
+    if (lower.contains('arm') || lower.contains('bicep')) return 'Arms';
+    if (lower.contains('core') || lower.contains('ab')) return 'Abs';
+    return 'Full Body';
+  }
+
+  String get difficulty => level;
+
   WorkoutPlan copyWith({
     String? id,
     String? userId,

@@ -8,7 +8,11 @@ import '../../../core/providers/app_providers.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/widgets/fitora_card.dart';
 import '../../../core/widgets/fitora_button.dart';
-import '../../../core/widgets/fitora_progress_ring.dart';
+import '../../../core/widgets/fitora_concentric_rings.dart';
+import '../../../core/widgets/fitora_water_bottle.dart';
+import '../../../core/widgets/fitora_macro_gauge.dart';
+import '../../../core/widgets/fitora_week_streak.dart';
+import '../../../core/widgets/fitora_muscle_badge.dart';
 import '../../../data/models/workout_plan.dart';
 
 class HomeDashboardScreen extends ConsumerWidget {
@@ -77,10 +81,17 @@ class HomeDashboardScreen extends ConsumerWidget {
                 _buildMotivationBanner(),
                 const SizedBox(height: AppSpacing.lg),
 
+                // 7-Day Consistency Streak
+                const FitoraWeekStreak(
+                  streakDays: 5,
+                  daysCompleted: [true, true, true, true, true, false, false],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+
                 // B. DAILY ACTIVITY RINGS (Steps, Active Min, Burned)
                 _buildActivitySection(
                   activity: activity,
-                  targetSteps: goal.targetSteps,
+                  goal: goal,
                   onAddSteps: () => ref.read(todayActivityProvider.notifier).addSteps(1000),
                 ),
                 const SizedBox(height: AppSpacing.lg),
@@ -215,10 +226,12 @@ class HomeDashboardScreen extends ConsumerWidget {
 
   Widget _buildActivitySection({
     required dynamic activity,
-    required int targetSteps,
+    required dynamic goal,
     required VoidCallback onAddSteps,
   }) {
-    final stepsProgress = targetSteps > 0 ? (activity.steps / targetSteps).clamp(0.0, 1.0) : 0.0;
+    final stepsProgress = goal.targetSteps > 0 ? (activity.steps / goal.targetSteps) : 0.0;
+    final exerciseProgress = 45 > 0 ? (activity.activeMinutes / 45.0) : 0.0;
+    final moveProgress = 600 > 0 ? (activity.caloriesBurned / 600.0) : 0.0;
 
     return FitoraCard(
       child: Column(
@@ -227,61 +240,41 @@ class HomeDashboardScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Daily Activity', style: AppTypography.labelLarge),
+              Row(
+                children: [
+                  const Icon(Icons.incomplete_circle_rounded, color: AppColors.primary, size: 20),
+                  const SizedBox(width: 8),
+                  Text('Daily Movement Rings', style: AppTypography.labelLarge),
+                ],
+              ),
               InkWell(
                 onTap: onAddSteps,
-                child: Text('+1k Steps', style: AppTypography.labelSmall.copyWith(color: AppColors.primary)),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Row(
-            children: [
-              FitoraProgressRing(
-                progress: stepsProgress,
-                size: 74,
-                strokeWidth: 7,
-                progressColor: AppColors.stepsAccent,
-                centerChild: const Icon(Icons.directions_walk_rounded, color: AppColors.stepsAccent, size: 24),
-              ),
-              const SizedBox(width: AppSpacing.lg),
-              Expanded(
-                child: Column(
-                  children: [
-                    _buildActivityStatRow('Steps', '${activity.steps}', '/ $targetSteps', AppColors.stepsAccent),
-                    const SizedBox(height: 8),
-                    _buildActivityStatRow('Active Time', '${activity.activeMinutes}m', '/ 45m', AppColors.workoutAccent),
-                    const SizedBox(height: 8),
-                    _buildActivityStatRow('Burned', '${activity.caloriesBurned}', 'kcal', AppColors.calorieAccent),
-                  ],
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text('+1k Steps', style: AppTypography.labelSmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
           ),
+          const SizedBox(height: AppSpacing.md),
+          FitoraConcentricRings(
+            moveProgress: moveProgress,
+            exerciseProgress: exerciseProgress,
+            standProgress: stepsProgress,
+            moveValue: activity.caloriesBurned,
+            moveTarget: 600,
+            exerciseValue: activity.activeMinutes,
+            exerciseTarget: 45,
+            standValue: activity.steps,
+            standTarget: goal.targetSteps,
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildActivityStatRow(String label, String value, String unit, Color color) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-            const SizedBox(width: 8),
-            Text(label, style: AppTypography.bodySmall),
-          ],
-        ),
-        Row(
-          children: [
-            Text(value, style: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.w700)),
-            const SizedBox(width: 4),
-            Text(unit, style: AppTypography.labelSmall),
-          ],
-        ),
-      ],
     );
   }
 
@@ -305,77 +298,32 @@ class HomeDashboardScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Nutrition Breakdown', style: AppTypography.labelLarge),
+              Row(
+                children: [
+                  const Icon(Icons.restaurant_rounded, color: AppColors.carbAccent, size: 20),
+                  const SizedBox(width: 8),
+                  Text('Nutrition & Fuel Target', style: AppTypography.labelLarge),
+                ],
+              ),
               InkWell(
                 onTap: () => context.push('/food-search?mealType=lunch'),
-                child: Text('+ Log Food', style: AppTypography.labelSmall.copyWith(color: AppColors.primary)),
+                child: Text('+ Log Food', style: AppTypography.labelSmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              FitoraProgressRing(
-                progress: calorieProgress,
-                size: 80,
-                strokeWidth: 8,
-                progressColor: AppColors.calorieAccent,
-                centerChild: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('$remainingCalories', style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.w800)),
-                    Text('left', style: AppTypography.labelSmall.copyWith(fontSize: 10)),
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSpacing.lg),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('$caloriesConsumed kcal eaten', style: AppTypography.bodySmall),
-                        Text('$calorieTarget goal', style: AppTypography.bodySmall.copyWith(color: AppColors.textMuted)),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    _buildMacroLinearBar('Protein', protein, targetProtein, AppColors.proteinAccent),
-                    const SizedBox(height: 6),
-                    _buildMacroLinearBar('Carbs', carbs, targetCarbs, AppColors.carbAccent),
-                    const SizedBox(height: 6),
-                    _buildMacroLinearBar('Fats', fat, targetFat, AppColors.fatAccent),
-                  ],
-                ),
-              ),
-            ],
+          FitoraMacroGauge(
+            caloriesConsumed: caloriesConsumed,
+            calorieTarget: calorieTarget,
+            proteinConsumed: protein,
+            proteinTarget: targetProtein,
+            carbsConsumed: carbs,
+            carbsTarget: targetCarbs,
+            fatConsumed: fat,
+            fatTarget: targetFat,
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildMacroLinearBar(String name, int current, int target, Color color) {
-    final fraction = target > 0 ? (current / target).clamp(0.0, 1.0) : 0.0;
-    return Row(
-      children: [
-        SizedBox(width: 50, child: Text(name, style: AppTypography.labelSmall)),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: fraction,
-              backgroundColor: AppColors.surfaceMuted,
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-              minHeight: 5,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text('${current}g', style: AppTypography.labelSmall.copyWith(fontWeight: FontWeight.w600)),
-      ],
     );
   }
 
@@ -384,8 +332,6 @@ class HomeDashboardScreen extends ConsumerWidget {
     required int waterGoalMl,
     required ValueChanged<int> onAddWater,
   }) {
-    final progress = waterGoalMl > 0 ? (waterConsumedMl / waterGoalMl).clamp(0.0, 1.0) : 0.0;
-
     return FitoraCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,52 +343,20 @@ class HomeDashboardScreen extends ConsumerWidget {
                 children: [
                   const Icon(Icons.water_drop_rounded, color: AppColors.waterAccent, size: 20),
                   const SizedBox(width: 8),
-                  Text('Hydration Target', style: AppTypography.labelLarge),
+                  Text('Daily Hydration', style: AppTypography.labelLarge),
                 ],
               ),
               Text(
-                '${(waterConsumedMl / 1000).toStringAsFixed(1)}L / ${(waterGoalMl / 1000).toStringAsFixed(1)}L',
-                style: AppTypography.labelMedium.copyWith(color: AppColors.waterAccent),
+                'Goal: ${(waterGoalMl / 1000).toStringAsFixed(1)}L',
+                style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary),
               ),
             ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: AppColors.waterAccent.withValues(alpha: 0.15),
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.waterAccent),
-              minHeight: 8,
-            ),
           ),
           const SizedBox(height: AppSpacing.md),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => onAddWater(250),
-                  icon: const Icon(Icons.local_drink_rounded, size: 16),
-                  label: const Text('+250 ml'),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(38),
-                    padding: EdgeInsets.zero,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => onAddWater(500),
-                  icon: const Icon(Icons.water_rounded, size: 16),
-                  label: const Text('+500 ml'),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(38),
-                    padding: EdgeInsets.zero,
-                  ),
-                ),
-              ),
-            ],
+          FitoraWaterBottle(
+            consumedMl: waterConsumedMl,
+            targetMl: waterGoalMl,
+            onAddWater: onAddWater,
           ),
         ],
       ),
@@ -475,18 +389,31 @@ class HomeDashboardScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              Text(
-                '${plan.estimatedDurationMinutes} mins',
-                style: AppTypography.labelSmall,
-              ),
+              FitoraDifficultyIndicator(difficulty: plan.difficulty),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(plan.title, style: AppTypography.headingSmall),
-          const SizedBox(height: 4),
-          Text(
-            '${plan.exercises.length} exercises • Progressive overload planned',
-            style: AppTypography.bodySmall,
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              const Icon(Icons.timer_outlined, size: 14, color: AppColors.textSecondary),
+              const SizedBox(width: 4),
+              Text('${plan.estimatedDurationMinutes} mins', style: AppTypography.bodySmall),
+              const SizedBox(width: 12),
+              const Icon(Icons.fitness_center_rounded, size: 14, color: AppColors.textSecondary),
+              const SizedBox(width: 4),
+              Text('${plan.exercises.length} exercises', style: AppTypography.bodySmall),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              FitoraMuscleBadge(muscle: plan.category.toUpperCase()),
+              const FitoraMuscleBadge(muscle: 'Hypertrophy', isSecondary: true),
+            ],
           ),
           const SizedBox(height: AppSpacing.md),
           FitoraButton(

@@ -222,6 +222,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               if (latestSleep != null) ...[
                 FitoraCard(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -232,26 +233,82 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                               Text('Last Night\'s Rest', style: AppTypography.labelMedium),
                               const SizedBox(height: 4),
                               Text('${latestSleep.durationHours} hrs',
-                                  style: AppTypography.headingLarge.copyWith(color: AppColors.sleepAccent)),
+                                  style: AppTypography.headingLarge.copyWith(color: AppColors.sleepAccent, fontWeight: FontWeight.w800)),
                             ],
                           ),
-                          Row(
-                            children: List.generate(
-                              5,
-                              (i) => Icon(
-                                i < latestSleep.qualityRating ? Icons.star_rounded : Icons.star_border_rounded,
-                                color: AppColors.warning,
-                                size: 20,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppColors.successLight,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text('88% Readiness', style: AppTypography.labelSmall.copyWith(color: AppColors.success, fontWeight: FontWeight.bold)),
                               ),
-                            ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: List.generate(
+                                  5,
+                                  (i) => Icon(
+                                    i < latestSleep.qualityRating ? Icons.star_rounded : Icons.star_border_rounded,
+                                    color: AppColors.warning,
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const Divider(height: 20),
+                      const SizedBox(height: AppSpacing.md),
+
+                      // Visual Sleep Architecture Bar
+                      Text('Sleep Stages Breakdown', style: AppTypography.labelSmall.copyWith(fontSize: 11, color: AppColors.textSecondary)),
+                      const SizedBox(height: 6),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(5),
+                        child: SizedBox(
+                          height: 10,
+                          child: Row(
+                            children: [
+                              Expanded(flex: 28, child: Container(color: const Color(0xFF4338CA))), // Deep
+                              const SizedBox(width: 2),
+                              Expanded(flex: 24, child: Container(color: const Color(0xFF7C3AED))), // REM
+                              const SizedBox(width: 2),
+                              Expanded(flex: 42, child: Container(color: const Color(0xFF38BDF8))), // Light
+                              const SizedBox(width: 2),
+                              Expanded(flex: 6, child: Container(color: const Color(0xFFF59E0B))), // Awake
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Bed: ${latestSleep.bedTime} • Wake: ${latestSleep.wakeTime}', style: AppTypography.bodySmall),
+                          _buildStageTag('Deep 2.1h', const Color(0xFF4338CA)),
+                          _buildStageTag('REM 1.8h', const Color(0xFF7C3AED)),
+                          _buildStageTag('Light 3.2h', const Color(0xFF38BDF8)),
+                          _buildStageTag('Awake 24m', const Color(0xFFF59E0B)),
+                        ],
+                      ),
+                      const Divider(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.favorite_rounded, color: Color(0xFFEF4444), size: 16),
+                              const SizedBox(width: 4),
+                              Text('Resting HR: 56 bpm', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+                              const SizedBox(width: 12),
+                              const Icon(Icons.show_chart_rounded, color: AppColors.primary, size: 16),
+                              const SizedBox(width: 4),
+                              Text('HRV: 64 ms', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+                            ],
+                          ),
                           _buildDeviceTag(isDevice: _healthConnectConnected),
                         ],
                       ),
@@ -361,6 +418,24 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
           color: isDevice ? AppColors.success : AppColors.textSecondary,
         ),
       ),
+    );
+  }
+
+  Widget _buildStageTag(String text, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: AppTypography.labelSmall.copyWith(fontSize: 10, color: AppColors.textSecondary),
+        ),
+      ],
     );
   }
 }

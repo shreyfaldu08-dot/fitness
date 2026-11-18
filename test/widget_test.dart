@@ -18,7 +18,8 @@ void main() {
         child: FitoraApp(),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.byType(FitoraApp), findsOneWidget);
   });

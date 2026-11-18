@@ -7,6 +7,7 @@ import '../../../core/constants/app_typography.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/fitora_card.dart';
 import '../../../core/widgets/fitora_button.dart';
+import '../../../core/widgets/fitora_muscle_badge.dart';
 import '../../../data/models/workout_plan.dart';
 
 class WorkoutHomeScreen extends ConsumerWidget {
@@ -222,10 +223,6 @@ class WorkoutHomeScreen extends ConsumerWidget {
   }
 
   Widget _buildPlanCard(BuildContext context, WorkoutPlan plan) {
-    Color levelColor = AppColors.success;
-    if (plan.level == 'intermediate') levelColor = AppColors.primary;
-    if (plan.level == 'advanced') levelColor = AppColors.workoutAccent;
-
     return FitoraCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,24 +230,8 @@ class WorkoutHomeScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: levelColor.withValues(alpha: 0.12),
-                  borderRadius: AppSpacing.roundedSm,
-                ),
-                child: Text(
-                  plan.level.toUpperCase(),
-                  style: AppTypography.labelSmall.copyWith(
-                    color: levelColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Text(
-                '${plan.daysPerWeek} days/wk • ~${plan.estimatedDurationMinutes}m',
-                style: AppTypography.labelSmall,
-              ),
+              FitoraMuscleBadge(muscle: plan.category.toUpperCase()),
+              FitoraDifficultyIndicator(difficulty: plan.difficulty),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -261,6 +242,22 @@ class WorkoutHomeScreen extends ConsumerWidget {
             style: AppTypography.bodySmall,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.calendar_today_rounded, size: 13, color: AppColors.textSecondary),
+              const SizedBox(width: 4),
+              Text('${plan.daysPerWeek} days/wk', style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary)),
+              const SizedBox(width: 12),
+              const Icon(Icons.timer_outlined, size: 13, color: AppColors.textSecondary),
+              const SizedBox(width: 4),
+              Text('~${plan.estimatedDurationMinutes}m', style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary)),
+              const SizedBox(width: 12),
+              const Icon(Icons.fitness_center_rounded, size: 13, color: AppColors.textSecondary),
+              const SizedBox(width: 4),
+              Text('${plan.exercises.length} movements', style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary)),
+            ],
           ),
           const SizedBox(height: AppSpacing.md),
           Row(
@@ -278,7 +275,7 @@ class WorkoutHomeScreen extends ConsumerWidget {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () => context.push('/active-workout', extra: plan),
-                  child: const Text('Start'),
+                  child: const Text('Start Routine'),
                 ),
               ),
             ],

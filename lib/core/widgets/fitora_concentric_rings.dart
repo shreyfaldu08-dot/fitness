@@ -137,9 +137,21 @@ class FitoraConcentricRings extends StatelessWidget {
               const SizedBox(height: 1),
               Row(
                 children: [
-                  Text(value, style: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.w700)),
+                  Flexible(
+                    child: Text(
+                      value,
+                      style: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.w700),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   const SizedBox(width: 3),
-                  Text(target, style: AppTypography.bodySmall.copyWith(fontSize: 10, color: AppColors.textMuted)),
+                  Flexible(
+                    child: Text(
+                      target,
+                      style: AppTypography.bodySmall.copyWith(fontSize: 10, color: AppColors.textMuted),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ],
               ),
             ],

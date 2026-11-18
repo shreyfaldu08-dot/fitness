@@ -31,13 +31,22 @@ class FitoraWeekStreak extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Text('🔥', style: TextStyle(fontSize: 16)),
-                  const SizedBox(width: 6),
-                  Text('$streakDays-Day Consistency Streak', style: AppTypography.labelLarge),
-                ],
+              Expanded(
+                child: Row(
+                  children: [
+                    const Text('🔥', style: TextStyle(fontSize: 16)),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        '$streakDays-Day Consistency Streak',
+                        style: AppTypography.labelLarge,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(

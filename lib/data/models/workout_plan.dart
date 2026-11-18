@@ -359,3 +359,164 @@ class WorkoutPlan {
     );
   }
 }
+
+/// A Single Week in a Multi-Week Periodized Training Program
+class ProgramWeek {
+  final int weekNumber;
+  final String focusTitle;
+  final List<WorkoutDaySchedule> days;
+
+  const ProgramWeek({
+    required this.weekNumber,
+    required this.focusTitle,
+    required this.days,
+  });
+
+  ProgramWeek copyWith({
+    int? weekNumber,
+    String? focusTitle,
+    List<WorkoutDaySchedule>? days,
+  }) {
+    return ProgramWeek(
+      weekNumber: weekNumber ?? this.weekNumber,
+      focusTitle: focusTitle ?? this.focusTitle,
+      days: days ?? this.days,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'week_number': weekNumber,
+      'focus_title': focusTitle,
+      'days': days.map((d) => d.toJson()).toList(),
+    };
+  }
+
+  factory ProgramWeek.fromJson(Map<String, dynamic> json, [List<Exercise>? catalog]) {
+    final rawDays = (json['days'] as List<dynamic>?) ?? [];
+    final parsedDays = rawDays
+        .map((d) => WorkoutDaySchedule.fromJson(d as Map<String, dynamic>, catalog))
+        .toList();
+
+    return ProgramWeek(
+      weekNumber: json['week_number'] as int? ?? 1,
+      focusTitle: json['focus_title'] as String? ?? 'Training Week',
+      days: parsedDays,
+    );
+  }
+}
+
+/// A Complete Multi-Week Customized or Common Periodized Program
+class MultiWeekProgram {
+  final String id;
+  final String title;
+  final String description;
+  final String goalType;
+  final String goalDisplayName;
+  final int totalWeeks;
+  final bool isCommonTemplate;
+  final List<ProgramWeek> weeks;
+  final DateTime createdAt;
+  final DateTime? activatedAt;
+
+  const MultiWeekProgram({
+    required this.id,
+    required this.title,
+    required this.description,
+    this.goalType = 'muscle_gain',
+    this.goalDisplayName = 'Muscle Hypertrophy & Mass',
+    this.totalWeeks = 4,
+    this.isCommonTemplate = true,
+    required this.weeks,
+    required this.createdAt,
+    this.activatedAt,
+  });
+
+  int get currentWeekNumber {
+    if (activatedAt == null || weeks.isEmpty) return 1;
+    final daysSinceStart = DateTime.now().difference(activatedAt!).inDays;
+    final week = (daysSinceStart ~/ 7) + 1;
+    return week.clamp(1, totalWeeks);
+  }
+
+  ProgramWeek get currentWeek {
+    final curNum = currentWeekNumber;
+    return weeks.firstWhere(
+      (w) => w.weekNumber == curNum,
+      orElse: () => weeks.isNotEmpty ? weeks.first : const ProgramWeek(weekNumber: 1, focusTitle: 'Foundation', days: []),
+    );
+  }
+
+  WorkoutDaySchedule? getTodaySchedule() {
+    final curWeek = currentWeek;
+    if (curWeek.days.isEmpty) return null;
+    final weekday = DateTime.now().weekday;
+    final dayIndex = (weekday - 1).clamp(0, curWeek.days.length - 1);
+    return curWeek.days[dayIndex];
+  }
+
+  MultiWeekProgram copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? goalType,
+    String? goalDisplayName,
+    int? totalWeeks,
+    bool? isCommonTemplate,
+    List<ProgramWeek>? weeks,
+    DateTime? createdAt,
+    DateTime? activatedAt,
+  }) {
+    return MultiWeekProgram(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      goalType: goalType ?? this.goalType,
+      goalDisplayName: goalDisplayName ?? this.goalDisplayName,
+      totalWeeks: totalWeeks ?? this.totalWeeks,
+      isCommonTemplate: isCommonTemplate ?? this.isCommonTemplate,
+      weeks: weeks ?? this.weeks,
+      createdAt: createdAt ?? this.createdAt,
+      activatedAt: activatedAt ?? this.activatedAt,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'goal_type': goalType,
+      'goal_display_name': goalDisplayName,
+      'total_weeks': totalWeeks,
+      'is_common_template': isCommonTemplate,
+      'weeks': weeks.map((w) => w.toJson()).toList(),
+      'created_at': createdAt.toIso8601String(),
+      'activated_at': activatedAt?.toIso8601String(),
+    };
+  }
+
+  factory MultiWeekProgram.fromJson(Map<String, dynamic> json, [List<Exercise>? catalog]) {
+    final rawWeeks = (json['weeks'] as List<dynamic>?) ?? [];
+    final parsedWeeks = rawWeeks
+        .map((w) => ProgramWeek.fromJson(w as Map<String, dynamic>, catalog))
+        .toList();
+
+    return MultiWeekProgram(
+      id: json['id'] as String? ?? 'mwp_${DateTime.now().millisecondsSinceEpoch}',
+      title: json['title'] as String? ?? 'Custom Multi-Week Program',
+      description: json['description'] as String? ?? 'Personalized periodized training.',
+      goalType: json['goal_type'] as String? ?? 'muscle_gain',
+      goalDisplayName: json['goal_display_name'] as String? ?? 'Muscle Hypertrophy',
+      totalWeeks: json['total_weeks'] as int? ?? 4,
+      isCommonTemplate: json['is_common_template'] as bool? ?? true,
+      weeks: parsedWeeks,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'] as String) ?? DateTime.now()
+          : DateTime.now(),
+      activatedAt: json['activated_at'] != null
+          ? DateTime.tryParse(json['activated_at'] as String)
+          : null,
+    );
+  }
+}

@@ -119,37 +119,41 @@ class _MainScaffoldScreenState extends State<MainScaffoldScreen> {
   }) {
     final isSelected = _currentIndex == index;
 
-    return InkWell(
-      onTap: () => setState(() => _currentIndex = index),
-      borderRadius: AppSpacing.roundedSm,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryLight : Colors.transparent,
-                borderRadius: AppSpacing.roundedFull,
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() => _currentIndex = index),
+        borderRadius: AppSpacing.roundedSm,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primaryLight : Colors.transparent,
+                  borderRadius: AppSpacing.roundedFull,
+                ),
+                child: Icon(
+                  isSelected ? activeIcon : icon,
+                  size: 22,
+                  color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                ),
               ),
-              child: Icon(
-                isSelected ? activeIcon : icon,
-                size: 22,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+              const SizedBox(height: 3),
+              Text(
+                label,
+                style: AppTypography.labelSmall.copyWith(
+                  fontSize: 10.5,
+                  color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              style: AppTypography.labelSmall.copyWith(
-                fontSize: 11,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

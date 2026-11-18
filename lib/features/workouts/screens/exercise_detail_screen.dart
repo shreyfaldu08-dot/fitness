@@ -7,6 +7,7 @@ import '../../../core/widgets/fitora_card.dart';
 import '../../../core/widgets/fitora_button.dart';
 import '../../../core/widgets/fitora_muscle_badge.dart';
 import '../../../core/widgets/fitora_muscle_illustration.dart';
+import '../../../core/widgets/fitora_animated_exercise_demo.dart';
 import '../../../data/models/exercise.dart';
 import '../../../data/models/workout_plan.dart';
 
@@ -83,6 +84,14 @@ class ExerciseDetailScreen extends StatelessWidget {
                     ],
                   ],
                 ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+
+              // Animated Movement Demonstration
+              FitoraAnimatedExerciseDemo(
+                exercise: ex,
+                height: 230,
+                showControls: true,
               ),
               const SizedBox(height: AppSpacing.lg),
 

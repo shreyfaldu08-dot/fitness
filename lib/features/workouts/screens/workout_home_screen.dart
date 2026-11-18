@@ -36,6 +36,7 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
     final workoutRepo = ref.watch(workoutRepositoryProvider);
     final allPlans = workoutRepo.getAllPlans();
     final sessions = workoutRepo.getWorkoutSessions();
+    final activeProgram = workoutRepo.getActiveMultiWeekProgram();
 
     final filteredPlans = _selectedGoal == 'all'
         ? allPlans
@@ -109,6 +110,76 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
+              // ACTIVE MULTI-WEEK PROGRAM CARD
+              FitoraCard(
+                padding: const EdgeInsets.all(16),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 1.2),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.stars_rounded, size: 14, color: AppColors.primary),
+                              SizedBox(width: 5),
+                              Text(
+                                'ACTIVE MULTI-WEEK PROGRAM',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          'Week ${activeProgram.currentWeekNumber} of ${activeProgram.totalWeeks}',
+                          style: AppTypography.labelSmall.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(activeProgram.title, style: AppTypography.headingSmall.copyWith(fontSize: 16)),
+                    const SizedBox(height: 3),
+                    Text(
+                      activeProgram.isCommonTemplate
+                          ? 'Common weekly routine repeating across ${activeProgram.totalWeeks} weeks'
+                          : 'Customized week-by-week mesocycle (${activeProgram.weeks.length} weeks configured)',
+                      style: AppTypography.bodySmall.copyWith(fontSize: 11.5, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            icon: const Icon(Icons.tune_rounded, size: 16),
+                            label: const Text('Customize Multi-Week Schedule', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                            onPressed: () => context.push('/multi-week-planner'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+
               // Quick Actions Row
               Row(
                 children: [
@@ -124,11 +195,11 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildActionCard(
-                      icon: Icons.add_circle_outline_rounded,
-                      title: 'Build Plan',
-                      subtitle: 'Custom routine',
+                      icon: Icons.calendar_month_rounded,
+                      title: 'Multi-Week Planner',
+                      subtitle: 'Custom 4-12 wks',
                       color: AppColors.proteinAccent,
-                      onTap: () => context.push('/workout-builder'),
+                      onTap: () => context.push('/multi-week-planner'),
                     ),
                   ),
                 ],

@@ -12,6 +12,7 @@ class WorkoutRepository {
   List<Exercise> _exercises = [];
   List<WorkoutPlan> _customPlans = [];
   List<WorkoutSession> _sessions = [];
+  MultiWeekProgram? _activeProgram;
 
   WorkoutRepository() {
     _loadLocalCache();
@@ -35,10 +36,67 @@ class WorkoutRepository {
           .map((s) => WorkoutSession.fromJson(s as Map<String, dynamic>))
           .toList();
     }
+
+    // Load active multi-week program
+    final storedProgram = StorageService.getJson('fitora_active_multi_week_program');
+    if (storedProgram is Map<String, dynamic>) {
+      _activeProgram = MultiWeekProgram.fromJson(storedProgram, _exercises);
+    } else {
+      _activeProgram = _createDefaultMultiWeekProgram();
+    }
+  }
+
+  MultiWeekProgram _createDefaultMultiWeekProgram() {
+    final templates = SeedWorkoutPlans.templates;
+    final basePlan = templates.isNotEmpty ? templates.first : null;
+    final defaultSchedule = basePlan?.weeklySchedule ?? [];
+
+    final weeks = List.generate(4, (i) {
+      final weekNum = i + 1;
+      String focus;
+      if (weekNum == 1) {
+        focus = 'Foundation & Movement Patterns';
+      } else if (weekNum == 2) {
+        focus = 'Volume Accumulation';
+      } else if (weekNum == 3) {
+        focus = 'Overload & Mechanical Tension';
+      } else {
+        focus = 'Peak Intensity & Testing';
+      }
+      return ProgramWeek(
+        weekNumber: weekNum,
+        focusTitle: focus,
+        days: defaultSchedule,
+      );
+    });
+
+    return MultiWeekProgram(
+      id: 'default_hypertrophy_4w',
+      title: '4-Week Hypertrophy & Muscle Mass Cycle',
+      description: 'Periodized 5-day Upper/Lower & PPL split designed for maximum myofibrillar growth.',
+      goalType: 'muscle_gain',
+      goalDisplayName: 'Muscle Hypertrophy & Mass',
+      totalWeeks: 4,
+      isCommonTemplate: true,
+      weeks: weeks,
+      createdAt: DateTime.now(),
+      activatedAt: DateTime.now(),
+    );
+  }
+
+  MultiWeekProgram getActiveMultiWeekProgram() {
+    return _activeProgram ?? _createDefaultMultiWeekProgram();
+  }
+
+  Future<void> saveActiveMultiWeekProgram(MultiWeekProgram program) async {
+    _activeProgram = program;
+    await StorageService.setJson(
+      'fitora_active_multi_week_program',
+      program.toJson(),
+    );
   }
 
   Future<List<Exercise>> getExercises({String? category, String? query}) async {
-    // Return filtered exercises
     return _exercises.where((e) {
       final matchesCategory = category == null ||
           category.isEmpty ||
@@ -89,7 +147,6 @@ class WorkoutRepository {
   }
 
   List<WorkoutSession> getWorkoutSessions() {
-    // Sorted with newest first
     _sessions.sort((a, b) => b.startedAt.compareTo(a.startedAt));
     return _sessions;
   }

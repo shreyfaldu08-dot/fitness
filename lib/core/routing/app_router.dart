@@ -10,6 +10,7 @@ import '../../features/workouts/screens/exercise_library_screen.dart';
 import '../../features/workouts/screens/exercise_detail_screen.dart';
 import '../../features/workouts/screens/active_workout_screen.dart';
 import '../../features/workouts/screens/workout_plan_builder_screen.dart';
+import '../../features/workouts/screens/multi_week_planner_screen.dart';
 import '../../features/workouts/screens/workout_history_screen.dart';
 import '../../features/nutrition/screens/food_search_screen.dart';
 import '../../features/nutrition/screens/meal_planner_screen.dart';
@@ -98,6 +99,11 @@ class AppRouter {
           final existingPlan = state.extra as WorkoutPlan?;
           return WorkoutPlanBuilderScreen(existingPlan: existingPlan);
         },
+      ),
+      GoRoute(
+        path: '/multi-week-planner',
+        name: 'multi_week_planner',
+        builder: (context, state) => const MultiWeekPlannerScreen(),
       ),
       GoRoute(
         path: '/active-workout',

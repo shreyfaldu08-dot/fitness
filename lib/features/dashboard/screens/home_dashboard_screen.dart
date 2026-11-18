@@ -12,8 +12,7 @@ import '../../../core/widgets/fitora_concentric_rings.dart';
 import '../../../core/widgets/fitora_water_bottle.dart';
 import '../../../core/widgets/fitora_macro_gauge.dart';
 import '../../../core/widgets/fitora_week_streak.dart';
-import '../../../core/widgets/fitora_muscle_badge.dart';
-import '../../../core/widgets/fitora_muscle_illustration.dart';
+import '../../../core/widgets/fitora_animated_exercise_demo.dart';
 import '../../../data/models/workout_plan.dart';
 
 class HomeDashboardScreen extends ConsumerWidget {
@@ -40,7 +39,9 @@ class HomeDashboardScreen extends ConsumerWidget {
     final remainingCalories = (targetCalories - totalCaloriesLogged).clamp(0, 5000);
     final calorieProgress = targetCalories > 0 ? (totalCaloriesLogged / targetCalories).clamp(0.0, 1.0) : 0.0;
 
-    // Get Today's scheduled or featured workout
+    // Active Multi-Week Program & Today's Schedule
+    final activeProgram = workoutRepo.getActiveMultiWeekProgram();
+    final todaySchedule = activeProgram.getTodaySchedule();
     final plans = workoutRepo.getAllPlans();
     final featuredPlan = plans.isNotEmpty ? plans.first : null;
 
@@ -121,15 +122,29 @@ class HomeDashboardScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.lg),
 
-                // E. TODAY'S WORKOUT
-                if (featuredPlan != null) ...[
-                  _buildTodayWorkoutCard(
-                    context: context,
-                    plan: featuredPlan,
-                    onStart: () => context.push('/active-workout', extra: featuredPlan),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                ],
+                // E. TODAY'S WORKOUT & ANIMATED MOTION
+                _buildTodayWorkoutCard(
+                  context: context,
+                  activeProgram: activeProgram,
+                  todaySchedule: todaySchedule,
+                  fallbackPlan: featuredPlan,
+                  onStart: () {
+                    if (todaySchedule != null && !todaySchedule.isRestDay && todaySchedule.exercises.isNotEmpty) {
+                      final dayPlan = WorkoutPlan(
+                        id: '${activeProgram.id}_today',
+                        title: todaySchedule.title,
+                        description: todaySchedule.coachTip,
+                        exercises: todaySchedule.exercises,
+                        goalType: activeProgram.goalType,
+                        goalDisplayName: activeProgram.goalDisplayName,
+                      );
+                      context.push('/active-workout', extra: dayPlan);
+                    } else if (featuredPlan != null) {
+                      context.push('/active-workout', extra: featuredPlan);
+                    }
+                  },
+                ),
+                const SizedBox(height: AppSpacing.lg),
 
                 // F. DAILY HABITS
                 _buildDailyHabitsSection(
@@ -164,19 +179,23 @@ class HomeDashboardScreen extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Good morning, $name',
-              style: AppTypography.headingLarge.copyWith(letterSpacing: -0.4),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              date,
-              style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
-            ),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Good morning, $name',
+                style: AppTypography.headingLarge.copyWith(letterSpacing: -0.4),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                date,
+                style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+              ),
+            ],
+          ),
         ),
         Row(
           children: [
@@ -241,13 +260,22 @@ class HomeDashboardScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.incomplete_circle_rounded, color: AppColors.primary, size: 20),
-                  const SizedBox(width: 8),
-                  Text('Daily Movement Rings', style: AppTypography.labelLarge),
-                ],
+              Flexible(
+                child: Row(
+                  children: [
+                    const Icon(Icons.incomplete_circle_rounded, color: AppColors.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        'Daily Movement Rings',
+                        style: AppTypography.labelLarge,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 6),
               InkWell(
                 onTap: onAddSteps,
                 borderRadius: BorderRadius.circular(8),
@@ -366,9 +394,19 @@ class HomeDashboardScreen extends ConsumerWidget {
 
   Widget _buildTodayWorkoutCard({
     required BuildContext context,
-    required WorkoutPlan plan,
+    required MultiWeekProgram activeProgram,
+    required WorkoutDaySchedule? todaySchedule,
+    required WorkoutPlan? fallbackPlan,
     required VoidCallback onStart,
   }) {
+    final isRest = todaySchedule?.isRestDay ?? false;
+    final title = todaySchedule?.title ?? fallbackPlan?.title ?? 'Daily Workout';
+    final duration = todaySchedule?.estimatedMinutes ?? fallbackPlan?.estimatedDurationMinutes ?? 45;
+    final exercises = todaySchedule?.exercises ?? fallbackPlan?.exercises ?? [];
+
+    // Lead exercise for motion animation
+    final leadEx = exercises.isNotEmpty ? exercises.first.exercise : null;
+
     return FitoraCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -376,80 +414,110 @@ class HomeDashboardScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: plan.goalBadgeColor.withValues(alpha: 0.12),
-                  borderRadius: AppSpacing.roundedSm,
-                  border: Border.all(color: plan.goalBadgeColor.withValues(alpha: 0.3)),
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.12),
+                    borderRadius: AppSpacing.roundedSm,
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.calendar_today_rounded, size: 12, color: AppColors.primary),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          'WEEK ${activeProgram.currentWeekNumber} OF ${activeProgram.totalWeeks} • ${activeProgram.goalDisplayName.toUpperCase()}',
+                          style: AppTypography.labelSmall.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 9.5,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+              ),
+              const SizedBox(width: 6),
+              InkWell(
+                onTap: () => context.push('/multi-week-planner'),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(plan.goalIcon, size: 13, color: plan.goalBadgeColor),
-                    const SizedBox(width: 5),
+                    const Icon(Icons.tune_rounded, size: 13, color: AppColors.primary),
+                    const SizedBox(width: 4),
                     Text(
-                      plan.goalDisplayName.toUpperCase(),
+                      'Customize',
                       style: AppTypography.labelSmall.copyWith(
-                        color: plan.goalBadgeColor,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 10,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
               ),
-              FitoraDifficultyIndicator(difficulty: plan.difficulty),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
+
+          Text(title, style: AppTypography.headingSmall),
+          const SizedBox(height: 4),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              FitoraMuscleIllustration(
-                muscle: plan.category,
-                width: 58,
-                height: 72,
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(plan.title, style: AppTypography.headingSmall),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        const Icon(Icons.timer_outlined, size: 14, color: AppColors.textSecondary),
-                        const SizedBox(width: 4),
-                        Text('${plan.estimatedDurationMinutes} mins', style: AppTypography.bodySmall),
-                        const SizedBox(width: 10),
-                        const Icon(Icons.fitness_center_rounded, size: 14, color: AppColors.textSecondary),
-                        const SizedBox(width: 4),
-                        Text('${plan.exercises.length} exercises', style: AppTypography.bodySmall),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 4,
-                      children: [
-                        FitoraMuscleBadge(muscle: plan.category.toUpperCase()),
-                        const FitoraMuscleBadge(muscle: 'Hypertrophy', isSecondary: true),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              const Icon(Icons.timer_outlined, size: 14, color: AppColors.textSecondary),
+              const SizedBox(width: 4),
+              Text('~$duration mins', style: AppTypography.bodySmall),
+              const SizedBox(width: 12),
+              const Icon(Icons.fitness_center_rounded, size: 14, color: AppColors.textSecondary),
+              const SizedBox(width: 4),
+              Text('${exercises.length} exercises scheduled', style: AppTypography.bodySmall),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          FitoraButton(
-            label: 'Start Workout Session',
-            icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 22),
-            onPressed: onStart,
-            height: 46,
-          ),
+
+          // ANIMATED EXERCISE DEMONSTRATION OF THE LEAD MOVEMENT
+          if (!isRest && leadEx != null) ...[
+            FitoraAnimatedExerciseDemo(
+              exercise: leadEx,
+              height: 180,
+              isCompact: true,
+              showControls: true,
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ] else if (isRest) ...[
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceMuted,
+                borderRadius: AppSpacing.roundedMd,
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.bedtime_rounded, color: AppColors.textSecondary, size: 24),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Today is scheduled as an active recovery day. Focus on 8+ hours sleep and hydration.',
+                      style: AppTypography.bodySmall.copyWith(fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ],
+
+          if (!isRest)
+            FitoraButton(
+              label: "Start Today's Workout",
+              icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 22),
+              onPressed: onStart,
+              height: 46,
+            ),
         ],
       ),
     );

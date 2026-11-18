@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_spacing.dart';
-import '../../../core/constants/app_typography.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/utils/date_formatter.dart';
-import '../../../core/widgets/fitora_card.dart';
-import '../../../core/widgets/fitora_button.dart';
 import '../../../core/widgets/fitora_concentric_rings.dart';
-import '../../../core/widgets/fitora_water_bottle.dart';
-import '../../../core/widgets/fitora_macro_gauge.dart';
 import '../../../core/widgets/fitora_week_streak.dart';
 import '../../../core/widgets/fitora_animated_exercise_demo.dart';
+import '../../../core/widgets/fitora_exercise_visual_tile.dart';
 import '../../../data/models/workout_plan.dart';
 
+/// Clean Minimalist "Today's Focus" Home Dashboard.
+/// Inspired by Apple Fitness: Crisp white surfaces, ample breathing room,
+/// prominent single workout card with realistic 3D animated demonstration,
+/// and smooth progress rings.
 class HomeDashboardScreen extends ConsumerWidget {
   const HomeDashboardScreen({super.key});
 
@@ -25,36 +24,22 @@ class HomeDashboardScreen extends ConsumerWidget {
     final activity = ref.watch(todayActivityProvider);
     final waterMl = ref.watch(todayWaterProvider);
     final nutritionLogs = ref.watch(nutritionLogsProvider);
-    final habits = ref.watch(habitsListProvider);
     final workoutRepo = ref.watch(workoutRepositoryProvider);
-    final progressRepo = ref.watch(progressRepositoryProvider);
 
-    // Calculate real nutrition totals for today
+    // Nutrition Totals
     final totalCaloriesLogged = nutritionLogs.fold(0.0, (sum, l) => sum + l.calories).round();
-    final totalProteinLogged = nutritionLogs.fold(0.0, (sum, l) => sum + l.protein).round();
-    final totalCarbsLogged = nutritionLogs.fold(0.0, (sum, l) => sum + l.carbs).round();
-    final totalFatLogged = nutritionLogs.fold(0.0, (sum, l) => sum + l.fat).round();
-
     final targetCalories = goal.targetCalories;
-    final remainingCalories = (targetCalories - totalCaloriesLogged).clamp(0, 5000);
-    final calorieProgress = targetCalories > 0 ? (totalCaloriesLogged / targetCalories).clamp(0.0, 1.0) : 0.0;
 
     // Active Multi-Week Program & Today's Schedule
     final activeProgram = workoutRepo.getActiveMultiWeekProgram();
     final todaySchedule = activeProgram.getTodaySchedule();
     final plans = workoutRepo.getAllPlans();
-    final featuredPlan = plans.isNotEmpty ? plans.first : null;
-
-    // Progress snapshot metrics
-    final latestMeas = progressRepo.getLatestMeasurement();
-    final currentWeight = latestMeas?.weightKg ?? profile?.currentWeightKg ?? 72.0;
-    final initialWeight = profile?.currentWeightKg ?? currentWeight;
-    final weightDelta = currentWeight - initialWeight;
+    final fallbackPlan = plans.isNotEmpty ? plans.first : null;
 
     final now = DateTime.now();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF8FAFC), // Apple-style pristine light neutral
       body: SafeArea(
         child: RefreshIndicator(
           color: AppColors.primary,
@@ -70,64 +55,28 @@ class HomeDashboardScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // A. GREETING & HEADER SECTION
-                _buildGreetingHeader(
+                // 1. MINIMAL HEADER BAR
+                _buildHeaderBar(
+                  context: context,
                   name: profile?.fullName ?? 'Athlete',
                   date: DateFormatter.formatFullDate(now),
-                  onAiTap: () => context.push('/ai-coach'),
-                  onAnalyticsTap: () => context.push('/analytics'),
                 ),
-                const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: 18),
 
-                // Motivation Insight
-                _buildMotivationBanner(),
-                const SizedBox(height: AppSpacing.lg),
-
-                // 7-Day Consistency Streak
-                const FitoraWeekStreak(
-                  streakDays: 5,
-                  daysCompleted: [true, true, true, true, true, false, false],
-                ),
-                const SizedBox(height: AppSpacing.lg),
-
-                // B. DAILY ACTIVITY RINGS (Steps, Active Min, Burned)
-                _buildActivitySection(
+                // 2. APPLE-STYLE ACTIVITY RINGS
+                _buildActivityRingsCard(
                   activity: activity,
                   goal: goal,
                   onAddSteps: () => ref.read(todayActivityProvider.notifier).addSteps(1000),
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: 18),
 
-                // C. NUTRITION SUMMARY
-                _buildNutritionSummaryCard(
-                  context: context,
-                  caloriesConsumed: totalCaloriesLogged,
-                  calorieTarget: targetCalories,
-                  remainingCalories: remainingCalories,
-                  calorieProgress: calorieProgress,
-                  protein: totalProteinLogged,
-                  targetProtein: goal.targetProteinG,
-                  carbs: totalCarbsLogged,
-                  targetCarbs: goal.targetCarbsG,
-                  fat: totalFatLogged,
-                  targetFat: goal.targetFatG,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-
-                // D. HYDRATION CARD (with Quick Add Buttons)
-                _buildHydrationCard(
-                  waterConsumedMl: waterMl,
-                  waterGoalMl: goal.targetWaterMl,
-                  onAddWater: (amount) => ref.read(todayWaterProvider.notifier).addWater(amount),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-
-                // E. TODAY'S WORKOUT & ANIMATED MOTION
-                _buildTodayWorkoutCard(
+                // 3. HERO: "TODAY'S FOCUS" WORKOUT CARD
+                _buildTodayFocusHeroCard(
                   context: context,
                   activeProgram: activeProgram,
                   todaySchedule: todaySchedule,
-                  fallbackPlan: featuredPlan,
+                  fallbackPlan: fallbackPlan,
                   onStart: () {
                     if (todaySchedule != null && !todaySchedule.isRestDay && todaySchedule.exercises.isNotEmpty) {
                       final dayPlan = WorkoutPlan(
@@ -139,28 +88,66 @@ class HomeDashboardScreen extends ConsumerWidget {
                         goalDisplayName: activeProgram.goalDisplayName,
                       );
                       context.push('/active-workout', extra: dayPlan);
-                    } else if (featuredPlan != null) {
-                      context.push('/active-workout', extra: featuredPlan);
+                    } else if (fallbackPlan != null) {
+                      context.push('/active-workout', extra: fallbackPlan);
                     }
                   },
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: 18),
 
-                // F. DAILY HABITS
-                _buildDailyHabitsSection(
-                  habits: habits,
-                  onToggle: (id) => ref.read(habitsListProvider.notifier).toggleHabit(id),
-                  onViewAll: () => context.push('/habits'),
+                // 4. QUICK FUEL & HYDRATION ROW
+                _buildFuelAndWaterRow(
+                  context: context,
+                  waterMl: waterMl,
+                  waterGoalMl: goal.targetWaterMl,
+                  caloriesLogged: totalCaloriesLogged,
+                  calorieTarget: targetCalories,
+                  onAddWater: (amt) => ref.read(todayWaterProvider.notifier).addWater(amt),
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: 18),
 
-                // G. PROGRESS SNAPSHOT
-                _buildProgressSnapshot(
-                  currentWeight: currentWeight,
-                  weightDelta: weightDelta,
-                  onTap: () => context.push('/analytics'),
+                // 5. 7-DAY CONSISTENCY STREAK
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: const FitoraWeekStreak(
+                    streakDays: 5,
+                    daysCompleted: [true, true, true, true, true, false, false],
+                  ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 18),
+
+                // 6. QUICK NAVIGATION TILES (Splits & Planner)
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildQuickTile(
+                        context: context,
+                        icon: Icons.fitness_center_rounded,
+                        color: const Color(0xFF2563EB),
+                        title: 'Workout Splits',
+                        subtitle: 'Goals & routines',
+                        onTap: () => context.push('/workouts'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildQuickTile(
+                        context: context,
+                        icon: Icons.calendar_month_rounded,
+                        color: const Color(0xFF10B981),
+                        title: 'Mesocycle',
+                        subtitle: 'Multi-week plan',
+                        onTap: () => context.push('/multi-week-planner'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 28),
               ],
             ),
           ),
@@ -169,11 +156,10 @@ class HomeDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildGreetingHeader({
+  Widget _buildHeaderBar({
+    required BuildContext context,
     required String name,
     required String date,
-    required VoidCallback onAiTap,
-    required VoidCallback onAnalyticsTap,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -185,34 +171,54 @@ class HomeDashboardScreen extends ConsumerWidget {
             children: [
               Text(
                 'Good morning, $name',
-                style: AppTypography.headingLarge.copyWith(letterSpacing: -0.4),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF0F172A),
+                  letterSpacing: -0.5,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 2),
               Text(
                 date,
-                style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF64748B),
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ],
           ),
         ),
         Row(
           children: [
-            IconButton(
-              onPressed: onAnalyticsTap,
-              icon: const Icon(Icons.bar_chart_rounded, size: 24, color: AppColors.textPrimary),
-              tooltip: 'Analytics',
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.primaryLight,
-                shape: BoxShape.circle,
+            InkWell(
+              onTap: () => context.push('/analytics'),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: const Icon(Icons.bar_chart_rounded, size: 20, color: Color(0xFF0F172A)),
               ),
-              child: IconButton(
-                onPressed: onAiTap,
-                icon: const Icon(Icons.auto_awesome_rounded, size: 20, color: AppColors.primary),
-                tooltip: 'AI Coach',
+            ),
+            const SizedBox(width: 8),
+            InkWell(
+              onTap: () => context.push('/ai-coach'),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEFF6FF),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFFBFDBFE)),
+                ),
+                child: const Icon(Icons.auto_awesome_rounded, size: 20, color: AppColors.primary),
               ),
             ),
           ],
@@ -221,82 +227,76 @@ class HomeDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMotivationBanner() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: AppSpacing.roundedMd,
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.lightbulb_outline_rounded, color: AppColors.warning, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'Consistency is key. Every clean rep and nutritious meal moves the needle.',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActivitySection({
+  Widget _buildActivityRingsCard({
     required dynamic activity,
     required dynamic goal,
     required VoidCallback onAddSteps,
   }) {
-    final stepsProgress = goal.targetSteps > 0 ? (activity.steps / goal.targetSteps) : 0.0;
-    final exerciseProgress = 45 > 0 ? (activity.activeMinutes / 45.0) : 0.0;
-    final moveProgress = 600 > 0 ? (activity.caloriesBurned / 600.0) : 0.0;
-
-    return FitoraCard(
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 14,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Flexible(
-                child: Row(
-                  children: [
-                    const Icon(Icons.incomplete_circle_rounded, color: AppColors.primary, size: 20),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        'Daily Movement Rings',
-                        style: AppTypography.labelLarge,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+              const Row(
+                children: [
+                  Icon(Icons.donut_large_rounded, color: AppColors.primary, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Daily Activity Rings',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 6),
               InkWell(
                 onTap: onAddSteps,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(8),
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                  child: Text('+1k Steps', style: AppTypography.labelSmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    '+ 1,000 Steps',
+                    style: TextStyle(
+                      color: Color(0xFF0F172A),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: 14),
           FitoraConcentricRings(
-            moveProgress: moveProgress,
-            exerciseProgress: exerciseProgress,
-            standProgress: stepsProgress,
+            moveProgress: (activity.caloriesBurned / 500.0).clamp(0.0, 1.5),
+            exerciseProgress: (activity.activeMinutes / 45.0).clamp(0.0, 1.5),
+            standProgress: (goal.targetSteps > 0
+                    ? activity.steps / goal.targetSteps
+                    : 0.0)
+                .clamp(0.0, 1.5),
             moveValue: activity.caloriesBurned,
-            moveTarget: 600,
+            moveTarget: 500,
             exerciseValue: activity.activeMinutes,
             exerciseTarget: 45,
             standValue: activity.steps,
@@ -307,92 +307,7 @@ class HomeDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNutritionSummaryCard({
-    required BuildContext context,
-    required int caloriesConsumed,
-    required int calorieTarget,
-    required int remainingCalories,
-    required double calorieProgress,
-    required int protein,
-    required int targetProtein,
-    required int carbs,
-    required int targetCarbs,
-    required int fat,
-    required int targetFat,
-  }) {
-    return FitoraCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.restaurant_rounded, color: AppColors.carbAccent, size: 20),
-                  const SizedBox(width: 8),
-                  Text('Nutrition & Fuel Target', style: AppTypography.labelLarge),
-                ],
-              ),
-              InkWell(
-                onTap: () => context.push('/food-search?mealType=lunch'),
-                child: Text('+ Log Food', style: AppTypography.labelSmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          FitoraMacroGauge(
-            caloriesConsumed: caloriesConsumed,
-            calorieTarget: calorieTarget,
-            proteinConsumed: protein,
-            proteinTarget: targetProtein,
-            carbsConsumed: carbs,
-            carbsTarget: targetCarbs,
-            fatConsumed: fat,
-            fatTarget: targetFat,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHydrationCard({
-    required int waterConsumedMl,
-    required int waterGoalMl,
-    required ValueChanged<int> onAddWater,
-  }) {
-    return FitoraCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.water_drop_rounded, color: AppColors.waterAccent, size: 20),
-                  const SizedBox(width: 8),
-                  Text('Daily Hydration', style: AppTypography.labelLarge),
-                ],
-              ),
-              Text(
-                'Goal: ${(waterGoalMl / 1000).toStringAsFixed(1)}L',
-                style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          FitoraWaterBottle(
-            consumedMl: waterConsumedMl,
-            targetMl: waterGoalMl,
-            onAddWater: onAddWater,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTodayWorkoutCard({
+  Widget _buildTodayFocusHeroCard({
     required BuildContext context,
     required MultiWeekProgram activeProgram,
     required WorkoutDaySchedule? todaySchedule,
@@ -400,251 +315,421 @@ class HomeDashboardScreen extends ConsumerWidget {
     required VoidCallback onStart,
   }) {
     final isRest = todaySchedule?.isRestDay ?? false;
-    final title = todaySchedule?.title ?? fallbackPlan?.title ?? 'Daily Workout';
+    final title = todaySchedule?.title ?? fallbackPlan?.title ?? 'Daily Movement Protocol';
     final duration = todaySchedule?.estimatedMinutes ?? fallbackPlan?.estimatedDurationMinutes ?? 45;
     final exercises = todaySchedule?.exercises ?? fallbackPlan?.exercises ?? [];
-
-    // Lead exercise for motion animation
     final leadEx = exercises.isNotEmpty ? exercises.first.exercise : null;
 
-    return FitoraCard(
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // PROGRAM STATUS PILL & MULTI-WEEK LABEL
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Flexible(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.12),
-                    borderRadius: AppSpacing.roundedSm,
-                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.calendar_today_rounded, size: 12, color: AppColors.primary),
-                      const SizedBox(width: 5),
-                      Flexible(
-                        child: Text(
-                          'WEEK ${activeProgram.currentWeekNumber} OF ${activeProgram.totalWeeks} • ${activeProgram.goalDisplayName.toUpperCase()}',
-                          style: AppTypography.labelSmall.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 9.5,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'WEEK ${activeProgram.currentWeekNumber} OF ${activeProgram.totalWeeks} • ${activeProgram.goalDisplayName.toUpperCase()}',
+                    style: const TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.4,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
-              const SizedBox(width: 6),
               InkWell(
                 onTap: () => context.push('/multi-week-planner'),
-                child: Row(
-                  children: [
-                    const Icon(Icons.tune_rounded, size: 13, color: AppColors.primary),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Customize',
-                      style: AppTypography.labelSmall.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                child: const Text(
+                  'Planner',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: 12),
 
-          Text(title, style: AppTypography.headingSmall),
+          // TITLE & DURATION
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF0F172A),
+              letterSpacing: -0.3,
+            ),
+          ),
           const SizedBox(height: 4),
           Row(
             children: [
-              const Icon(Icons.timer_outlined, size: 14, color: AppColors.textSecondary),
+              const Icon(Icons.timer_outlined, size: 14, color: Color(0xFF64748B)),
               const SizedBox(width: 4),
-              Text('~$duration mins', style: AppTypography.bodySmall),
+              Text(
+                '~$duration mins',
+                style: const TextStyle(fontSize: 12.5, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+              ),
               const SizedBox(width: 12),
-              const Icon(Icons.fitness_center_rounded, size: 14, color: AppColors.textSecondary),
+              const Icon(Icons.fitness_center_rounded, size: 14, color: Color(0xFF64748B)),
               const SizedBox(width: 4),
-              Text('${exercises.length} exercises scheduled', style: AppTypography.bodySmall),
+              Text(
+                '${exercises.length} movements scheduled',
+                style: const TextStyle(fontSize: 12.5, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+              ),
             ],
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: 14),
 
-          // ANIMATED EXERCISE DEMONSTRATION OF THE LEAD MOVEMENT
+          // 3D ANIMATED MOVEMENT OF TODAY'S LEAD EXERCISE
           if (!isRest && leadEx != null) ...[
             FitoraAnimatedExerciseDemo(
               exercise: leadEx,
-              height: 180,
+              height: 200,
               isCompact: true,
               showControls: true,
             ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: 14),
           ] else if (isRest) ...[
             Container(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
-                borderRadius: AppSpacing.roundedMd,
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Row(
+              child: const Row(
                 children: [
-                  const Icon(Icons.bedtime_rounded, color: AppColors.textSecondary, size: 24),
-                  const SizedBox(width: 12),
+                  Icon(Icons.bedtime_rounded, color: Color(0xFF64748B), size: 24),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Today is scheduled as an active recovery day. Focus on 8+ hours sleep and hydration.',
-                      style: AppTypography.bodySmall.copyWith(fontSize: 12),
+                      'Scheduled Rest & Muscle Recovery Day. Focus on hydration and light walking.',
+                      style: TextStyle(fontSize: 12.5, color: Color(0xFF475569), fontWeight: FontWeight.w500),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: 14),
           ],
 
-          if (!isRest)
-            FitoraButton(
-              label: "Start Today's Workout",
-              icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 22),
-              onPressed: onStart,
-              height: 46,
-            ),
+          // ACTION BUTTONS: Start Workout & View Breakdown
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: ElevatedButton.icon(
+                  onPressed: onStart,
+                  icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 22),
+                  label: Text(
+                    isRest ? 'Train Anyway' : 'Start Today\'s Workout',
+                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2563EB),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+              if (exercises.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 2,
+                  child: OutlinedButton(
+                    onPressed: () => _showExerciseBreakdown(context, title, exercises),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.2),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text(
+                      'View Plan',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: Color(0xFF0F172A),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildDailyHabitsSection({
-    required List<dynamic> habits,
-    required ValueChanged<String> onToggle,
-    required VoidCallback onViewAll,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Daily Habits', style: AppTypography.labelLarge),
-            InkWell(
-              onTap: onViewAll,
-              child: Text('Manage', style: AppTypography.labelSmall.copyWith(color: AppColors.primary)),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        SizedBox(
-          height: 94,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: habits.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 10),
-            itemBuilder: (context, index) {
-              final habit = habits[index];
-              return InkWell(
-                onTap: () => onToggle(habit.id),
-                borderRadius: AppSpacing.roundedMd,
+  void _showExerciseBreakdown(BuildContext context, String title, List<PlanExercise> exercises) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.8,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 12),
+              Center(
                 child: Container(
-                  width: 135,
-                  padding: const EdgeInsets.all(12),
+                  width: 40,
+                  height: 4,
                   decoration: BoxDecoration(
-                    color: habit.isCompletedToday ? AppColors.successLight : Colors.white,
-                    borderRadius: AppSpacing.roundedMd,
-                    border: Border.all(
-                      color: habit.isCompletedToday ? AppColors.success : AppColors.border,
-                      width: 1.2,
-                    ),
+                    color: const Color(0xFFCBD5E1),
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF0F172A),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  '${exercises.length} exercises with 3D movement scans',
+                  style: const TextStyle(fontSize: 12.5, color: Color(0xFF64748B)),
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  itemCount: exercises.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (c, i) {
+                    final ex = exercises[i];
+                    return FitoraExerciseVisualTile(
+                      planExercise: ex,
+                      index: i + 1,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFuelAndWaterRow({
+    required BuildContext context,
+    required int waterMl,
+    required int waterGoalMl,
+    required int caloriesLogged,
+    required int calorieTarget,
+    required ValueChanged<int> onAddWater,
+  }) {
+    return Row(
+      children: [
+        // HYDRATION PILL
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Icon(Icons.water_drop_rounded, color: Color(0xFF0EA5E9), size: 18),
+                    InkWell(
+                      onTap: () => onAddWater(250),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE0F2FE),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          '+250ml',
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${(waterMl / 1000).toStringAsFixed(1)} / ${(waterGoalMl / 1000).toStringAsFixed(1)} L',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                const Text('Hydration Log', style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+
+        // NUTRITION PILL
+        Expanded(
+          child: InkWell(
+            onTap: () => context.push('/food-search?mealType=lunch'),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Icon(
-                            habit.isCompletedToday ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
-                            size: 18,
-                            color: habit.isCompletedToday ? AppColors.success : AppColors.textSecondary,
-                          ),
-                          Text(
-                            '🔥 ${habit.currentStreak}d',
-                            style: AppTypography.labelSmall.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        habit.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTypography.labelSmall.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: habit.isCompletedToday ? AppColors.success : AppColors.textPrimary,
+                      const Icon(Icons.restaurant_rounded, color: Color(0xFFF59E0B), size: 18),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFEF3C7),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          '+ Food',
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFB45309)),
                         ),
                       ),
                     ],
                   ),
-                ),
-              );
-            },
+                  const SizedBox(height: 8),
+                  Text(
+                    '$caloriesLogged / $calorieTarget kcal',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text('Nutrition Target', style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                ],
+              ),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildProgressSnapshot({
-    required double currentWeight,
-    required double weightDelta,
+  Widget _buildQuickTile({
+    required BuildContext context,
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String subtitle,
     required VoidCallback onTap,
   }) {
-    final isLoss = weightDelta < 0;
-
-    return FitoraCard(
+    return InkWell(
       onTap: onTap,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Transformation Snapshot', style: AppTypography.labelLarge),
-              const SizedBox(height: 4),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(9),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${currentWeight.toStringAsFixed(1)} kg', style: AppTypography.statDisplay.copyWith(fontSize: 22)),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: isLoss ? AppColors.successLight : AppColors.primaryLight,
-                      borderRadius: AppSpacing.roundedSm,
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
                     ),
-                    child: Text(
-                      '${isLoss ? "" : "+"}${weightDelta.toStringAsFixed(1)} kg',
-                      style: AppTypography.labelSmall.copyWith(
-                        color: isLoss ? AppColors.success : AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(fontSize: 10.5, color: Color(0xFF64748B)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
-            ],
-          ),
-          const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textSecondary),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

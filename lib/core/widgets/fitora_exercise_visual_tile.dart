@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import '../constants/app_colors.dart';
-import '../constants/app_spacing.dart';
-import '../constants/app_typography.dart';
 import '../../data/models/exercise.dart';
 import '../../data/models/workout_plan.dart';
 import 'fitora_muscle_badge.dart';
-import 'fitora_muscle_illustration.dart';
 
-/// Highly visual exercise tile displaying both the movement photography
-/// and the 3D anatomical silhouette with highlighted target muscles.
+/// Clean minimalist Apple Fitness-inspired exercise tile.
+/// Features a compact 3D animated movement preview, target muscle badge,
+/// and clear sets/reps/weight metrics.
 class FitoraExerciseVisualTile extends StatelessWidget {
   final PlanExercise? planExercise;
   final Exercise? exercise;
@@ -43,9 +41,7 @@ class FitoraExerciseVisualTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final ex = _effectiveExercise;
     final primaryMuscle = ex.targetMuscle;
-    final secondaryMuscles = ex.secondaryMuscles;
     final highlightColor = FitoraMuscleBadge.getMuscleColor(primaryMuscle);
-    final isBack = FitoraMuscleIllustration.isBackMuscle(primaryMuscle);
 
     final targetSets = planExercise?.targetSets ?? ex.defaultSets;
     final targetReps = planExercise?.targetReps ?? ex.defaultReps;
@@ -57,237 +53,185 @@ class FitoraExerciseVisualTile extends StatelessWidget {
           () {
             context.push('/exercise-detail', extra: ex);
           },
-      borderRadius: AppSpacing.roundedMd,
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: AppSpacing.roundedMd,
-          border: Border.all(color: highlightColor.withValues(alpha: 0.25), width: 1.2),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
           boxShadow: [
             BoxShadow(
-              color: highlightColor.withValues(alpha: 0.06),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
-              offset: const Offset(0, 3),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Row(
           children: [
-            // DUAL VISUAL COMPONENT: Movement Photo + Neon Anatomical Silhouette
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  width: 96,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0F172A), // Dark slate
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: highlightColor.withValues(alpha: 0.45), width: 1.2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: highlightColor.withValues(alpha: 0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(9),
-                    child: Row(
-                      children: [
-                        // Left half: Exercise Photo
-                        Expanded(
-                          flex: 1,
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              if (ex.imageUrl.isNotEmpty)
-                                CachedNetworkImage(
-                                  imageUrl: ex.imageUrl,
-                                  fit: BoxFit.cover,
-                                  placeholder: (_, __) => Container(
-                                    color: const Color(0xFF1E293B),
-                                    child: const Center(
-                                      child: SizedBox(
-                                        width: 14,
-                                        height: 14,
-                                        child: CircularProgressIndicator(strokeWidth: 1.5, color: Colors.white54),
-                                      ),
-                                    ),
-                                  ),
-                                  errorWidget: (_, __, ___) => Container(
-                                    color: const Color(0xFF1E293B),
-                                    child: const Icon(Icons.fitness_center_rounded, color: Colors.white38, size: 20),
-                                  ),
-                                )
-                              else
-                                Container(
-                                  color: const Color(0xFF1E293B),
-                                  child: const Icon(Icons.fitness_center_rounded, color: Colors.white38, size: 20),
-                                ),
-                              // Gradient shadow separating photo and muscle map
-                              Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Colors.transparent,
-                                      const Color(0xFF0F172A).withValues(alpha: 0.7),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Right half: Realistic Neon Anatomical Silhouette
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            color: const Color(0xFF090D16),
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                FitoraMuscleIllustration(
-                                  muscle: primaryMuscle,
-                                  width: 44,
-                                  height: 68,
-                                  showContainer: false,
-                                ),
-                                Positioned(
-                                  bottom: 2,
-                                  right: 2,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                                    decoration: BoxDecoration(
-                                      color: highlightColor.withValues(alpha: 0.25),
-                                      borderRadius: BorderRadius.circular(3),
-                                    ),
-                                    child: Text(
-                                      isBack ? 'POST' : 'ANT',
-                                      style: TextStyle(
-                                        color: highlightColor,
-                                        fontSize: 7,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+            // STEP NUMBER (if provided)
+            if (index != null) ...[
+              Container(
+                width: 26,
+                height: 26,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  '$index',
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
+              ),
+              const SizedBox(width: 10),
+            ],
 
-                // Step # badge (e.g. 1, 2, 3)
-                if (index != null)
-                  Positioned(
-                    top: -5,
-                    left: -5,
-                    child: Container(
-                      width: 22,
-                      height: 22,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 1.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.4),
-                            blurRadius: 4,
-                            offset: const Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          '$index',
-                          style: const TextStyle(
+            // 3D ANIMATED MOTION THUMBNAIL
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: 68,
+                height: 68,
+                color: const Color(0xFFF8FAFC),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Image.asset(
+                      ex.localAssetGif,
+                      fit: BoxFit.contain,
+                      gaplessPlayback: true,
+                      errorBuilder: (_, __, ___) {
+                        if (ex.gifUrl.isNotEmpty) {
+                          return Image.network(
+                            ex.gifUrl,
+                            fit: BoxFit.contain,
+                            gaplessPlayback: true,
+                            errorBuilder: (_, __, ___) => _buildFallbackPhoto(ex),
+                          );
+                        }
+                        return _buildFallbackPhoto(ex);
+                      },
+                    ),
+                    // Small "3D" pill in bottom right of thumbnail
+                    Positioned(
+                      bottom: 2,
+                      right: 2,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0F172A).withValues(alpha: 0.8),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          '3D',
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w900,
+                            fontSize: 7.5,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                  ),
-              ],
+                  ],
+                ),
+              ),
             ),
             const SizedBox(width: 14),
 
-            // EXERCISE INFO & TARGET DETAILS
+            // MIDDLE INFO: Name, Target Muscle Chip, Sets/Reps
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     ex.name,
-                    style: AppTypography.labelLarge.copyWith(
+                    style: const TextStyle(
+                      fontSize: 14.5,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: Color(0xFF0F172A),
+                      letterSpacing: -0.2,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
 
-                  // Target Muscles & Equipment Badges
-                  Wrap(
-                    spacing: 4,
-                    runSpacing: 4,
+                  // Minimal Target Muscle Chip
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      FitoraMuscleBadge(muscle: primaryMuscle),
-                      if (secondaryMuscles.isNotEmpty)
-                        FitoraMuscleBadge(muscle: secondaryMuscles.first, isSecondary: true),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceMuted,
-                          borderRadius: BorderRadius.circular(4),
+                          color: highlightColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        child: Text(
-                          ex.equipment.toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
-                            letterSpacing: 0.4,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 5,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                color: highlightColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            Flexible(
+                              child: Text(
+                                primaryMuscle,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: highlightColor,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 5),
 
-                  // Sets, Reps, and Rest
+                  // Sets, Reps & Load Details
                   Row(
                     children: [
-                      const Icon(Icons.repeat_rounded, size: 13, color: AppColors.textSecondary),
-                      const SizedBox(width: 4),
                       Text(
                         '$targetSets sets × $targetReps reps',
-                        style: AppTypography.bodySmall.copyWith(
+                        style: const TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: Color(0xFF64748B),
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.timer_outlined, size: 13, color: AppColors.textSecondary),
-                      const SizedBox(width: 4),
+                      if (weightKg != null && weightKg > 0) ...[
+                        const Text(' • ', style: TextStyle(color: Color(0xFF94A3B8))),
+                        Text(
+                          '${weightKg.toStringAsFixed(weightKg.truncateToDouble() == weightKg ? 0 : 1)} kg',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                      ],
+                      const Text(' • ', style: TextStyle(color: Color(0xFF94A3B8))),
                       Text(
                         '${restSeconds}s rest',
-                        style: AppTypography.bodySmall.copyWith(
-                          fontSize: 11,
-                          color: AppColors.textSecondary,
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          color: Color(0xFF94A3B8),
                         ),
                       ),
                     ],
@@ -295,35 +239,34 @@ class FitoraExerciseVisualTile extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
 
-            // TARGET WEIGHT CHIP & CHEVRON
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                if (weightKg != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceMuted,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Text(
-                      weightKg > 0 ? '${weightKg.toStringAsFixed(weightKg.truncateToDouble() == weightKg ? 0 : 1)} kg' : 'Bodywt',
-                      style: AppTypography.labelSmall.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                const SizedBox(height: 4),
-                const Icon(Icons.chevron_right_rounded, size: 20, color: AppColors.textMuted),
-              ],
+            // RIGHT CHEVRON
+            const Padding(
+              padding: EdgeInsets.only(left: 6),
+              child: Icon(
+                Icons.chevron_right_rounded,
+                color: Color(0xFF94A3B8),
+                size: 20,
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFallbackPhoto(Exercise ex) {
+    if (ex.imageUrl.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: ex.imageUrl,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => const Center(
+          child: Icon(Icons.fitness_center_rounded, size: 20, color: Color(0xFF94A3B8)),
+        ),
+      );
+    }
+    return const Center(
+      child: Icon(Icons.fitness_center_rounded, size: 20, color: Color(0xFF94A3B8)),
     );
   }
 }

@@ -58,13 +58,14 @@ class _FitoraWeeklySplitViewState extends State<FitoraWeeklySplitView> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           decoration: BoxDecoration(
-            color: const Color(0xFF0F172A), // Dark athletic slate
-            borderRadius: AppSpacing.roundedMd,
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
             boxShadow: [
               BoxShadow(
-                color: themeColor.withValues(alpha: 0.15),
-                blurRadius: 12,
-                offset: const Offset(0, 3),
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -87,18 +88,16 @@ class _FitoraWeeklySplitViewState extends State<FitoraWeeklySplitView> {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? themeColor.withValues(alpha: 0.28)
+                          ? themeColor.withValues(alpha: 0.12)
                           : isRest
-                              ? Colors.white.withValues(alpha: 0.04)
-                              : Colors.white.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(8),
+                              ? const Color(0xFFF1F5F9)
+                              : Colors.white,
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isSelected
                             ? themeColor
-                            : isRest
-                                ? Colors.transparent
-                                : Colors.white.withValues(alpha: 0.12),
-                        width: isSelected ? 1.8 : 1,
+                            : const Color(0xFFE2E8F0),
+                        width: isSelected ? 1.6 : 1,
                       ),
                     ),
                     child: Column(
@@ -106,7 +105,7 @@ class _FitoraWeeklySplitViewState extends State<FitoraWeeklySplitView> {
                         Text(
                           day.dayOfWeek,
                           style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.white70,
+                            color: isSelected ? themeColor : const Color(0xFF475569),
                             fontSize: 10.5,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.5,
@@ -117,16 +116,20 @@ class _FitoraWeeklySplitViewState extends State<FitoraWeeklySplitView> {
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                           decoration: BoxDecoration(
                             color: isRest
-                                ? const Color(0xFF64748B).withValues(alpha: 0.4)
+                                ? const Color(0xFFE2E8F0)
                                 : isSelected
                                     ? themeColor
-                                    : Colors.white.withValues(alpha: 0.15),
+                                    : const Color(0xFFF1F5F9),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
                             isRest ? 'REST' : _getShortSplitTag(day.title),
                             style: TextStyle(
-                              color: isRest ? const Color(0xFFCBD5E1) : Colors.white,
+                              color: isRest
+                                  ? const Color(0xFF64748B)
+                                  : isSelected
+                                      ? Colors.white
+                                      : const Color(0xFF334155),
                               fontSize: 8,
                               fontWeight: FontWeight.w900,
                             ),

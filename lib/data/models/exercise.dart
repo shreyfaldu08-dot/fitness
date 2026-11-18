@@ -12,6 +12,7 @@ class Exercise {
   final int restSeconds;
   final String safetyGuidance;
   final String imageUrl;
+  final String gifUrl;
 
   const Exercise({
     required this.id,
@@ -27,7 +28,11 @@ class Exercise {
     this.restSeconds = 90,
     required this.safetyGuidance,
     this.imageUrl = '',
+    this.gifUrl = '',
   });
+
+  /// Local downloaded 3D animation GIF path
+  String get localAssetGif => 'assets/exercises/$id.gif';
 
   String get categoryDisplayName {
     switch (category) {
@@ -68,6 +73,7 @@ class Exercise {
       'rest_seconds': restSeconds,
       'safety_guidance': safetyGuidance,
       'image_url': imageUrl,
+      'gif_url': gifUrl,
     };
   }
 
@@ -89,6 +95,7 @@ class Exercise {
       restSeconds: json['rest_seconds'] as int? ?? 90,
       safetyGuidance: json['safety_guidance'] as String? ?? '',
       imageUrl: json['image_url'] as String? ?? '',
+      gifUrl: json['gif_url'] as String? ?? '',
     );
   }
 }

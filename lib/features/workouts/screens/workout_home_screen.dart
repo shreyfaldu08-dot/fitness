@@ -411,9 +411,20 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
   Widget _buildPlanCard(BuildContext context, WorkoutPlan plan) {
     final goalColor = plan.goalBadgeColor;
 
-    return FitoraCard(
+    return Container(
       padding: const EdgeInsets.all(18),
-      border: Border.all(color: goalColor.withValues(alpha: 0.3), width: 1.2),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 14,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

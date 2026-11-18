@@ -21,6 +21,7 @@ class SeedExercises {
       safetyGuidance:
           'Never bounce the bar off your ribcage. Maintain a natural slight lumbar arch and keep wrists neutral.',
       imageUrl: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif',
     ),
     Exercise(
       id: 'ex_chest_incline_db_press',
@@ -38,6 +39,7 @@ class SeedExercises {
       safetyGuidance:
           'Avoid flaring elbows 90 degrees outward to protect the rotator cuff tendons.',
       imageUrl: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/dumbbell-incline-bench-press.gif',
     ),
     Exercise(
       id: 'ex_chest_cable_flyes',
@@ -55,6 +57,7 @@ class SeedExercises {
       safetyGuidance:
           'Keep your torso stable and avoid swinging your back to initiate movement.',
       imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/cable-standing-fly.gif',
     ),
     Exercise(
       id: 'ex_chest_pushups',
@@ -72,6 +75,7 @@ class SeedExercises {
       safetyGuidance:
           'Do not let your hips sag toward the ground. Keep your cervical spine neutral.',
       imageUrl: 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/push-up.gif',
     ),
 
     // --- BACK ---
@@ -91,6 +95,7 @@ class SeedExercises {
       safetyGuidance:
           'Maintain a rigid neutral spine. Do not round upper or lower back under load.',
       imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/glutes/barbell-deadlift.gif',
     ),
     Exercise(
       id: 'ex_back_lat_pulldown',
@@ -108,6 +113,7 @@ class SeedExercises {
       safetyGuidance:
           'Do not pull behind your neck. Never use excessive body momentum to jerk the weight down.',
       imageUrl: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/lats/cable-bar-lateral-pulldown.gif',
     ),
     Exercise(
       id: 'ex_back_barbell_row',
@@ -125,6 +131,7 @@ class SeedExercises {
       safetyGuidance:
           'Brace core to protect lower back. Keep neck in neutral alignment with your spine.',
       imageUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/upper-back/barbell-bent-over-row.gif',
     ),
 
     // --- SHOULDERS ---
@@ -144,6 +151,7 @@ class SeedExercises {
       safetyGuidance:
           'Do not hyper-extend lumbar spine. Keep ribcage pulled down throughout the press.',
       imageUrl: 'https://images.unsplash.com/photo-1532029837206-abbe2b7620e3?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/delts/barbell-seated-overhead-press.gif',
     ),
     Exercise(
       id: 'ex_shoulders_lateral_raise',
@@ -161,6 +169,7 @@ class SeedExercises {
       safetyGuidance:
           'Lead with elbows, not wrists. Avoid shrugging traps to heave dumbbells up.',
       imageUrl: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/delts/dumbbell-lateral-raise.gif',
     ),
 
     // --- BICEPS ---
@@ -180,6 +189,7 @@ class SeedExercises {
       safetyGuidance:
           'Do not swing hips or lean back. Keep upper arms perpendicular to the floor.',
       imageUrl: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/barbell-curl.gif',
     ),
     Exercise(
       id: 'ex_biceps_hammer_curl',
@@ -197,6 +207,7 @@ class SeedExercises {
       safetyGuidance:
           'Maintain stable wrists; do not let the wrists bend backwards under weight.',
       imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/dumbbell-hammer-curl.gif',
     ),
 
     // --- TRICEPS ---
@@ -216,6 +227,7 @@ class SeedExercises {
       safetyGuidance:
           'Do not let elbows drift forward or backward during the movement; keep them locked in place.',
       imageUrl: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/cable-pushdown-with-rope-attachment.gif',
     ),
     Exercise(
       id: 'ex_triceps_skull_crusher',
@@ -233,6 +245,7 @@ class SeedExercises {
       safetyGuidance:
           'Use a safe, controllable weight. Keep upper arms angled back slightly (10°) to protect elbows.',
       imageUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/barbell-lying-triceps-extension-skull-crusher.gif',
     ),
 
     // --- LEGS & GLUTES ---
@@ -252,6 +265,7 @@ class SeedExercises {
       safetyGuidance:
           'Do not let knees cave inwards (valgus collapse). Keep chest proud and heels planted.',
       imageUrl: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/glutes/barbell-full-squat.gif',
     ),
     Exercise(
       id: 'ex_legs_romanian_deadlift',
@@ -269,6 +283,7 @@ class SeedExercises {
       safetyGuidance:
           'Hinge through hips, do not round lower back. Stop once hips cannot travel further backward.',
       imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/glutes/barbell-romanian-deadlift.gif',
     ),
     Exercise(
       id: 'ex_legs_bulgarian_split_squat',
@@ -286,6 +301,7 @@ class SeedExercises {
       safetyGuidance:
           'Ensure front foot is positioned far enough forward so front knee stays tracked over foot.',
       imageUrl: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/quads/dumbbell-single-leg-split-squat.gif',
     ),
 
     // --- ABS & CORE ---
@@ -305,6 +321,7 @@ class SeedExercises {
       safetyGuidance:
           'Focus on posterior pelvic tilt at the top to target abdominal muscles rather than hip flexors only.',
       imageUrl: 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/hanging-leg-raise.gif',
     ),
     Exercise(
       id: 'ex_abs_plank',
@@ -322,6 +339,7 @@ class SeedExercises {
       safetyGuidance:
           'Never let hips sag down or pike into the air. Breathe steadily; do not hold breath.',
       imageUrl: 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/weighted-front-plank.gif',
     ),
 
     // --- CARDIO ---
@@ -341,6 +359,7 @@ class SeedExercises {
       safetyGuidance:
           'Step onto side rails safely before adjusting high speeds. Wear properly cushioned running footwear.',
       imageUrl: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/cardio/run.gif',
     ),
     Exercise(
       id: 'ex_cardio_jump_rope',
@@ -358,6 +377,7 @@ class SeedExercises {
       safetyGuidance:
           'Stay light on your feet; jump only 1 to 2 inches off the ground to minimize joint impact.',
       imageUrl: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/cardio/jump-rope.gif',
     ),
 
     // --- FULL BODY ---
@@ -377,6 +397,7 @@ class SeedExercises {
       safetyGuidance:
           'The swing is a hip hinge power movement, not a shoulder front raise or squat. Do not lift with arms.',
       imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/glutes/kettlebell-swing.gif',
     ),
     Exercise(
       id: 'ex_fullbody_burpees',
@@ -394,6 +415,7 @@ class SeedExercises {
       safetyGuidance:
           'Land softly on the balls of your feet to dissipate shock into ankles and knees.',
       imageUrl: 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=600&auto=format&fit=crop',
+      gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/cardio/burpee.gif',
     ),
   ];
 }

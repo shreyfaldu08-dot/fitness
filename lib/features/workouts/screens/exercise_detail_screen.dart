@@ -92,6 +92,7 @@ class ExerciseDetailScreen extends StatelessWidget {
                 secondaryMuscles: ex.secondaryMuscles,
                 exerciseName: ex.name,
                 equipment: ex.equipment,
+                demoImageUrl: ex.imageUrl,
               ),
               const SizedBox(height: AppSpacing.lg),
 

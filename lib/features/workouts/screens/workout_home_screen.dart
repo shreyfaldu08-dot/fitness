@@ -328,89 +328,99 @@ class WorkoutHomeScreen extends ConsumerWidget {
                         final muscle = ex.exercise?.targetMuscle ?? plan.category;
                         final secondary = ex.exercise?.secondaryMuscles ?? [];
 
-                        return Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: AppSpacing.roundedMd,
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: Row(
-                            children: [
-                              // Step # and Anatomical Muscle Illustration
-                              Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  FitoraMuscleIllustration(
-                                    muscle: muscle,
-                                    width: 52,
-                                    height: 64,
-                                  ),
-                                  Positioned(
-                                    top: -4,
-                                    left: -4,
-                                    child: Container(
-                                      width: 20,
-                                      height: 20,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 1.5),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          '${i + 1}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
+                        return InkWell(
+                          onTap: () {
+                            if (ex.exercise != null) {
+                              context.push('/exercise-detail', extra: ex.exercise);
+                            }
+                          },
+                          borderRadius: AppSpacing.roundedMd,
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: AppSpacing.roundedMd,
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Row(
+                              children: [
+                                // Step # and Anatomical Muscle Illustration
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    FitoraMuscleIllustration(
+                                      muscle: muscle,
+                                      width: 54,
+                                      height: 66,
+                                    ),
+                                    Positioned(
+                                      top: -4,
+                                      left: -4,
+                                      child: Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primary,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.white, width: 1.5),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '${i + 1}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 12),
-
-                              // Exercise details
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(name, style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.bold)),
-                                    const SizedBox(height: 4),
-                                    Wrap(
-                                      spacing: 4,
-                                      runSpacing: 4,
-                                      children: [
-                                        FitoraMuscleBadge(muscle: muscle),
-                                        if (secondary.isNotEmpty)
-                                          FitoraMuscleBadge(muscle: secondary.first, isSecondary: true),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${ex.targetSets} sets × ${ex.targetReps} reps • ${ex.restSeconds}s rest',
-                                      style: AppTypography.bodySmall.copyWith(fontSize: 11, color: AppColors.textSecondary),
-                                    ),
                                   ],
                                 ),
-                              ),
+                                const SizedBox(width: 12),
 
-                              // Target Weight
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: AppColors.surfaceMuted,
-                                  borderRadius: BorderRadius.circular(8),
+                                // Exercise details
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(name, style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.bold)),
+                                      const SizedBox(height: 4),
+                                      Wrap(
+                                        spacing: 4,
+                                        runSpacing: 4,
+                                        children: [
+                                          FitoraMuscleBadge(muscle: muscle),
+                                          if (secondary.isNotEmpty)
+                                            FitoraMuscleBadge(muscle: secondary.first, isSecondary: true),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${ex.targetSets} sets × ${ex.targetReps} reps • ${ex.restSeconds}s rest',
+                                        style: AppTypography.bodySmall.copyWith(fontSize: 11, color: AppColors.textSecondary),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                child: Text(
-                                  '${ex.defaultWeightKg} kg',
-                                  style: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+
+                                // Target Weight
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceMuted,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    '${ex.defaultWeightKg} kg',
+                                    style: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+                                  ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 4),
+                                const Icon(Icons.chevron_right_rounded, size: 18, color: AppColors.textMuted),
+                              ],
+                            ),
                           ),
                         );
                       },

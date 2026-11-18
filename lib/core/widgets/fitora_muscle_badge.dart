@@ -13,61 +13,70 @@ class FitoraMuscleBadge extends StatelessWidget {
   });
 
   static Color getMuscleColor(String muscle) {
-    switch (muscle.toLowerCase()) {
-      case 'chest':
-        return const Color(0xFFEF4444); // Red
-      case 'back':
-      case 'lats':
-        return const Color(0xFF2563EB); // Royal Blue
-      case 'shoulders':
-      case 'deltoids':
-        return const Color(0xFFF97316); // Orange
-      case 'legs':
-      case 'quadriceps':
-      case 'hamstrings':
-      case 'glutes':
-      case 'calves':
-        return const Color(0xFF10B981); // Emerald
-      case 'biceps':
-      case 'triceps':
-      case 'arms':
-        return const Color(0xFF8B5CF6); // Purple
-      case 'abs':
-      case 'core':
-        return const Color(0xFFEAB308); // Gold/Amber
-      case 'cardio':
-        return const Color(0xFFEC4899); // Pink
-      default:
-        return const Color(0xFF64748B); // Slate
+    final lower = muscle.toLowerCase();
+    if (lower.contains('chest') || lower.contains('pec') || lower.contains('bench')) {
+      return const Color(0xFFFF2A4B); // Vibrant Electric Crimson
     }
+    if (lower.contains('back') || lower.contains('lat') || lower.contains('pulldown') || lower.contains('rhomboid')) {
+      return const Color(0xFF0070F3); // Vibrant Sapphire Blue
+    }
+    if (lower.contains('shoulder') || lower.contains('deltoid') || lower.contains('lateral') || lower.contains('overhead')) {
+      return const Color(0xFFFF6D00); // Glowing Electric Orange / Flame
+    }
+    if (lower.contains('quad') || lower.contains('squat') || lower.contains('thigh') || lower.contains('lunge')) {
+      return const Color(0xFF00E676); // Radiant Neon Emerald
+    }
+    if (lower.contains('glute') || lower.contains('hip')) {
+      return const Color(0xFF10B981); // Vivid Jade
+    }
+    if (lower.contains('hamstring') || lower.contains('rdl')) {
+      return const Color(0xFF059669); // Deep Emerald
+    }
+    if (lower.contains('bicep') || lower.contains('curl')) {
+      return const Color(0xFFA855F7); // Electric Neon Purple
+    }
+    if (lower.contains('tricep') || lower.contains('pushdown') || lower.contains('skull')) {
+      return const Color(0xFF8B5CF6); // Vibrant Indigo-Violet
+    }
+    if (lower.contains('arm')) {
+      return const Color(0xFFA855F7);
+    }
+    if (lower.contains('ab') || lower.contains('core') || lower.contains('plank') || lower.contains('crunch')) {
+      return const Color(0xFFFFB300); // Glowing Warm Amber / Gold
+    }
+    if (lower.contains('calf') || lower.contains('calves') || lower.contains('gastrocnemius')) {
+      return const Color(0xFF06B6D4); // Electric Cyan
+    }
+    if (lower.contains('cardio') || lower.contains('full body') || lower.contains('burpee')) {
+      return const Color(0xFFEC4899); // Electric Hot Pink
+    }
+    return const Color(0xFF38BDF8); // Electric Sky Blue default
   }
 
   static IconData getMuscleIcon(String muscle) {
-    switch (muscle.toLowerCase()) {
-      case 'chest':
-        return Icons.shield_outlined;
-      case 'back':
-      case 'lats':
-        return Icons.view_sidebar_rounded;
-      case 'shoulders':
-      case 'deltoids':
-        return Icons.fitness_center_rounded;
-      case 'legs':
-      case 'quadriceps':
-      case 'hamstrings':
-        return Icons.directions_walk_rounded;
-      case 'biceps':
-      case 'triceps':
-      case 'arms':
-        return Icons.sports_gymnastics_rounded;
-      case 'abs':
-      case 'core':
-        return Icons.bolt_rounded;
-      case 'cardio':
-        return Icons.favorite_rounded;
-      default:
-        return Icons.accessibility_new_rounded;
+    final lower = muscle.toLowerCase();
+    if (lower.contains('chest') || lower.contains('pec') || lower.contains('bench')) {
+      return Icons.shield_outlined;
     }
+    if (lower.contains('back') || lower.contains('lat') || lower.contains('pull') || lower.contains('row')) {
+      return Icons.view_sidebar_rounded;
+    }
+    if (lower.contains('shoulder') || lower.contains('deltoid') || lower.contains('lateral')) {
+      return Icons.fitness_center_rounded;
+    }
+    if (lower.contains('quad') || lower.contains('squat') || lower.contains('leg')) {
+      return Icons.directions_walk_rounded;
+    }
+    if (lower.contains('bicep') || lower.contains('curl') || lower.contains('arm') || lower.contains('tricep')) {
+      return Icons.sports_gymnastics_rounded;
+    }
+    if (lower.contains('ab') || lower.contains('core') || lower.contains('plank')) {
+      return Icons.bolt_rounded;
+    }
+    if (lower.contains('cardio') || lower.contains('full body')) {
+      return Icons.favorite_rounded;
+    }
+    return Icons.accessibility_new_rounded;
   }
 
   @override

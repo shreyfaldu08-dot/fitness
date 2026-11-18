@@ -1,0 +1,223 @@
+import '../models/workout_plan.dart';
+import 'seed_exercises.dart';
+
+class SeedWorkoutPlans {
+  SeedWorkoutPlans._();
+
+  static List<WorkoutPlan> get templates {
+    final exMap = {for (var e in SeedExercises.list) e.id: e};
+
+    return [
+      WorkoutPlan(
+        id: 'plan_beginner_full_body',
+        title: 'Beginner Full Body Foundation',
+        description:
+            'A 3-day weekly routine designed to build foundational motor control, joint stability, and full-body muscle coordination.',
+        level: 'beginner',
+        daysPerWeek: 3,
+        estimatedDurationMinutes: 40,
+        isTemplate: true,
+        exercises: [
+          PlanExercise(
+            exerciseId: 'ex_legs_barbell_squat',
+            exercise: exMap['ex_legs_barbell_squat'],
+            orderIndex: 0,
+            targetSets: 3,
+            targetReps: 10,
+            restSeconds: 90,
+            defaultWeightKg: 30.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_chest_bench_press',
+            exercise: exMap['ex_chest_bench_press'],
+            orderIndex: 1,
+            targetSets: 3,
+            targetReps: 10,
+            restSeconds: 90,
+            defaultWeightKg: 25.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_back_lat_pulldown',
+            exercise: exMap['ex_back_lat_pulldown'],
+            orderIndex: 2,
+            targetSets: 3,
+            targetReps: 10,
+            restSeconds: 75,
+            defaultWeightKg: 35.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_shoulders_lateral_raise',
+            exercise: exMap['ex_shoulders_lateral_raise'],
+            orderIndex: 3,
+            targetSets: 3,
+            targetReps: 12,
+            restSeconds: 60,
+            defaultWeightKg: 6.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_abs_plank',
+            exercise: exMap['ex_abs_plank'],
+            orderIndex: 4,
+            targetSets: 3,
+            targetReps: 45,
+            restSeconds: 60,
+            defaultWeightKg: 0.0,
+          ),
+        ],
+      ),
+      WorkoutPlan(
+        id: 'plan_intermediate_upper_push_pull',
+        title: 'Intermediate Upper Hypertrophy',
+        description:
+            'Balanced 4-day split focus targeting chest, upper back, shoulders, and arms for hypertrophy and posture.',
+        level: 'intermediate',
+        daysPerWeek: 4,
+        estimatedDurationMinutes: 50,
+        isTemplate: true,
+        exercises: [
+          PlanExercise(
+            exerciseId: 'ex_chest_incline_db_press',
+            exercise: exMap['ex_chest_incline_db_press'],
+            orderIndex: 0,
+            targetSets: 4,
+            targetReps: 8,
+            restSeconds: 90,
+            defaultWeightKg: 22.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_back_barbell_row',
+            exercise: exMap['ex_back_barbell_row'],
+            orderIndex: 1,
+            targetSets: 4,
+            targetReps: 8,
+            restSeconds: 90,
+            defaultWeightKg: 45.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_shoulders_overhead_press',
+            exercise: exMap['ex_shoulders_overhead_press'],
+            orderIndex: 2,
+            targetSets: 3,
+            targetReps: 8,
+            restSeconds: 90,
+            defaultWeightKg: 35.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_biceps_barbell_curl',
+            exercise: exMap['ex_biceps_barbell_curl'],
+            orderIndex: 3,
+            targetSets: 3,
+            targetReps: 10,
+            restSeconds: 75,
+            defaultWeightKg: 20.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_triceps_rope_pushdown',
+            exercise: exMap['ex_triceps_rope_pushdown'],
+            orderIndex: 4,
+            targetSets: 3,
+            targetReps: 12,
+            restSeconds: 60,
+            defaultWeightKg: 25.0,
+          ),
+        ],
+      ),
+      WorkoutPlan(
+        id: 'plan_advanced_lower_power',
+        title: 'Lower Body Strength & Posterior Chain',
+        description:
+            'Heavy compound lifts targeting maximum quadriceps, hamstring, and gluteal force production.',
+        level: 'advanced',
+        daysPerWeek: 5,
+        estimatedDurationMinutes: 55,
+        isTemplate: true,
+        exercises: [
+          PlanExercise(
+            exerciseId: 'ex_legs_barbell_squat',
+            exercise: exMap['ex_legs_barbell_squat'],
+            orderIndex: 0,
+            targetSets: 4,
+            targetReps: 6,
+            restSeconds: 150,
+            defaultWeightKg: 80.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_legs_romanian_deadlift',
+            exercise: exMap['ex_legs_romanian_deadlift'],
+            orderIndex: 1,
+            targetSets: 4,
+            targetReps: 8,
+            restSeconds: 120,
+            defaultWeightKg: 70.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_legs_bulgarian_split_squat',
+            exercise: exMap['ex_legs_bulgarian_split_squat'],
+            orderIndex: 2,
+            targetSets: 3,
+            targetReps: 10,
+            restSeconds: 90,
+            defaultWeightKg: 16.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_abs_hanging_leg_raise',
+            exercise: exMap['ex_abs_hanging_leg_raise'],
+            orderIndex: 3,
+            targetSets: 3,
+            targetReps: 12,
+            restSeconds: 60,
+            defaultWeightKg: 0.0,
+          ),
+        ],
+      ),
+      WorkoutPlan(
+        id: 'plan_hiit_fat_loss',
+        title: 'Metabolic Conditioning & Core',
+        description:
+            'High intensity interval circuit elevating caloric expenditure and cardiovascular conditioning.',
+        level: 'intermediate',
+        daysPerWeek: 3,
+        estimatedDurationMinutes: 30,
+        isTemplate: true,
+        exercises: [
+          PlanExercise(
+            exerciseId: 'ex_fullbody_kettlebell_swing',
+            exercise: exMap['ex_fullbody_kettlebell_swing'],
+            orderIndex: 0,
+            targetSets: 4,
+            targetReps: 15,
+            restSeconds: 45,
+            defaultWeightKg: 16.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_chest_pushups',
+            exercise: exMap['ex_chest_pushups'],
+            orderIndex: 1,
+            targetSets: 4,
+            targetReps: 15,
+            restSeconds: 45,
+            defaultWeightKg: 0.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_fullbody_burpees',
+            exercise: exMap['ex_fullbody_burpees'],
+            orderIndex: 2,
+            targetSets: 3,
+            targetReps: 12,
+            restSeconds: 60,
+            defaultWeightKg: 0.0,
+          ),
+          PlanExercise(
+            exerciseId: 'ex_cardio_jump_rope',
+            exercise: exMap['ex_cardio_jump_rope'],
+            orderIndex: 3,
+            targetSets: 4,
+            targetReps: 60,
+            restSeconds: 30,
+            defaultWeightKg: 0.0,
+          ),
+        ],
+      ),
+    ];
+  }
+}

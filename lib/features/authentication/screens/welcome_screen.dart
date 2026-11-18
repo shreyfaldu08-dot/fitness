@@ -100,6 +100,12 @@ class WelcomeScreen extends StatelessWidget {
                 variant: FitoraButtonVariant.outline,
                 onPressed: () => context.push('/login'),
               ),
+              const SizedBox(height: AppSpacing.sm),
+              FitoraButton(
+                label: 'Skip Sign-In (Continue as Guest)',
+                variant: FitoraButtonVariant.ghost,
+                onPressed: () => context.go('/'),
+              ),
               const SizedBox(height: AppSpacing.md),
 
               // Disclaimer

@@ -58,8 +58,27 @@ class AuthRepository {
       _currentUser = AuthUser.fromJson(storedJson as Map<String, dynamic>);
       _authStreamController.add(_currentUser);
     } else {
-      _authStreamController.add(null);
+      // Allow instant access by defaulting to a guest user session
+      _currentUser = const AuthUser(
+        id: 'athlete_1',
+        email: 'alex.vance@example.com',
+        fullName: 'Alex Vance',
+      );
+      _authStreamController.add(_currentUser);
     }
+  }
+
+  Future<AuthUser> continueAsGuest() async {
+    const guestUser = AuthUser(
+      id: 'athlete_1',
+      email: 'alex.vance@example.com',
+      fullName: 'Alex Vance',
+    );
+    _currentUser = guestUser;
+    await StorageService.setJson(AppConstants.keyAuthSession, guestUser.toJson());
+    await StorageService.setBool(AppConstants.keyOnboardingComplete, true);
+    _authStreamController.add(_currentUser);
+    return guestUser;
   }
 
   Future<AuthUser> signUp({

@@ -3,7 +3,7 @@ import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_typography.dart';
 
-enum FitoraButtonVariant { primary, secondary, outline, text, danger }
+enum FitoraButtonVariant { primary, secondary, outline, text, danger, ghost }
 
 class FitoraButton extends StatelessWidget {
   final String label;
@@ -54,6 +54,10 @@ class FitoraButton extends StatelessWidget {
       case FitoraButtonVariant.danger:
         bgColor = AppColors.errorLight;
         fgColor = AppColors.error;
+        break;
+      case FitoraButtonVariant.ghost:
+        bgColor = Colors.transparent;
+        fgColor = AppColors.textSecondary;
         break;
     }
 

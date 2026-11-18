@@ -176,7 +176,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     _handleLogin();
                   },
                 ),
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.sm),
+
+                FitoraButton(
+                  label: 'Skip Sign-In (Continue as Guest)',
+                  variant: FitoraButtonVariant.ghost,
+                  onPressed: () => context.go('/'),
+                ),
+                const SizedBox(height: AppSpacing.lg),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

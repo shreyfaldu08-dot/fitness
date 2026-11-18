@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/services/storage_service.dart';
 import '../../features/authentication/screens/welcome_screen.dart';
 import '../../features/authentication/screens/login_screen.dart';
 import '../../features/authentication/screens/signup_screen.dart';
@@ -180,15 +178,7 @@ class AppRouter {
   );
 
   static String _determineInitialLocation() {
-    final hasSession = StorageService.getString(AppConstants.keyAuthSession) != null;
-    final isOnboardingDone = StorageService.getBool(AppConstants.keyOnboardingComplete) ?? false;
-
-    if (!hasSession && !isOnboardingDone) {
-      return '/welcome';
-    } else if (!isOnboardingDone) {
-      return '/onboarding';
-    } else {
-      return '/';
-    }
+    // Allows immediate direct access to the main dashboard without requiring sign-in
+    return '/';
   }
 }

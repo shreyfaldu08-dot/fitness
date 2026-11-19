@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
-import '../constants/app_spacing.dart';
-import '../constants/app_typography.dart';
 
+/// Clean minimalist Capsule Week Streak Tracker.
+/// Displays daily consistency as vertical stadium pills.
 class FitoraWeekStreak extends StatelessWidget {
   final int streakDays;
   final List<bool> daysCompleted; // 7 booleans for Monday through Sunday
@@ -19,50 +18,69 @@ class FitoraWeekStreak extends StatelessWidget {
     final todayWeekday = DateTime.now().weekday; // 1 = Mon, 7 = Sun
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: AppSpacing.roundedMd,
-        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+            blurRadius: 14,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // HEADER ROW: Capsule Streak Pill + Status Pill
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF3C7),
+                  borderRadius: BorderRadius.circular(999),
+                ),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('🔥', style: TextStyle(fontSize: 16)),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Text(
-                        '$streakDays-Day Consistency Streak',
-                        style: AppTypography.labelLarge,
-                        overflow: TextOverflow.ellipsis,
+                    const Text('🔥', style: TextStyle(fontSize: 13)),
+                    const SizedBox(width: 5),
+                    Text(
+                      '$streakDays-DAY STREAK',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFFB45309),
+                        letterSpacing: 0.4,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
-                  borderRadius: BorderRadius.circular(10),
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(999),
                 ),
-                child: Text(
-                  'Week 4',
-                  style: AppTypography.labelSmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
+                child: const Text(
+                  'Week 4 Consistency',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF64748B),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: 14),
 
-          // 7-Day Visual Circles Row
+          // 7 VERTICAL CAPSULE PILLS ROW
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(7, (index) {
@@ -70,59 +88,98 @@ class FitoraWeekStreak extends StatelessWidget {
               final isDone = index < daysCompleted.length ? daysCompleted[index] : false;
               final isPast = (index + 1) < todayWeekday;
 
-              Color circleBg;
-              Color borderColor;
-              Widget iconChild;
+              Color capsuleBg;
+              Color capsuleBorder;
+              Color textColor;
+              Widget statusWidget;
 
               if (isDone) {
-                circleBg = const Color(0xFF10B981);
-                borderColor = const Color(0xFF10B981);
-                iconChild = const Icon(Icons.check_rounded, color: Colors.white, size: 16);
+                capsuleBg = const Color(0xFFDCFCE7);
+                capsuleBorder = const Color(0xFF86EFAC);
+                textColor = const Color(0xFF166534);
+                statusWidget = Container(
+                  width: 20,
+                  height: 20,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF10B981),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.check_rounded, color: Colors.white, size: 14),
+                );
               } else if (isToday) {
-                circleBg = AppColors.primaryLight;
-                borderColor = AppColors.primary;
-                iconChild = const Icon(Icons.fitness_center_rounded, color: AppColors.primary, size: 14);
+                capsuleBg = const Color(0xFFEFF6FF);
+                capsuleBorder = const Color(0xFF3B82F6);
+                textColor = const Color(0xFF1D4ED8);
+                statusWidget = Container(
+                  width: 20,
+                  height: 20,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF2563EB),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 14),
+                );
               } else if (isPast) {
-                circleBg = const Color(0xFFF1F5F9);
-                borderColor = const Color(0xFFE2E8F0);
-                iconChild = const Icon(Icons.remove_rounded, color: Color(0xFF94A3B8), size: 14);
+                capsuleBg = const Color(0xFFF8FAFC);
+                capsuleBorder = const Color(0xFFE2E8F0);
+                textColor = const Color(0xFF94A3B8);
+                statusWidget = Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFCBD5E1),
+                    shape: BoxShape.circle,
+                  ),
+                );
               } else {
-                circleBg = Colors.white;
-                borderColor = AppColors.border;
-                iconChild = const SizedBox();
+                capsuleBg = Colors.white;
+                capsuleBorder = const Color(0xFFE2E8F0);
+                textColor = const Color(0xFF94A3B8);
+                statusWidget = Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
+                  ),
+                );
               }
 
-              return Column(
-                children: [
-                  Text(
-                    dayLabels[index],
-                    style: AppTypography.labelSmall.copyWith(
-                      fontSize: 11,
-                      fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                      color: isToday ? AppColors.primary : AppColors.textSecondary,
-                    ),
+              return Container(
+                width: 38,
+                height: 68,
+                decoration: BoxDecoration(
+                  color: capsuleBg,
+                  borderRadius: BorderRadius.circular(999), // Stadium Capsule Shape
+                  border: Border.all(
+                    color: capsuleBorder,
+                    width: isToday ? 1.8 : 1.0,
                   ),
-                  const SizedBox(height: 6),
-                  Container(
-                    width: 34,
-                    height: 34,
-                    decoration: BoxDecoration(
-                      color: circleBg,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: borderColor, width: isToday ? 2.0 : 1.2),
-                      boxShadow: isDone
-                          ? [
-                              BoxShadow(
-                                color: const Color(0xFF10B981).withValues(alpha: 0.25),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              )
-                            ]
-                          : null,
+                  boxShadow: isToday
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFF2563EB).withValues(alpha: 0.15),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      dayLabels[index],
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: isToday ? FontWeight.w800 : FontWeight.w700,
+                        color: textColor,
+                      ),
                     ),
-                    child: Center(child: iconChild),
-                  ),
-                ],
+                    statusWidget,
+                  ],
+                ),
               );
             }),
           ),

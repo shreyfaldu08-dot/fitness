@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 
 class FitoraCard extends StatelessWidget {
@@ -28,16 +27,23 @@ class FitoraCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveRadius = borderRadius ?? AppSpacing.roundedLg;
-    final effectiveShadows = shadows ?? AppColors.cardShadow;
+    final effectiveRadius = borderRadius ?? BorderRadius.circular(24);
+    final effectiveShadows = shadows ??
+        [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ];
 
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: color ?? AppColors.surface,
+        color: color ?? Colors.white,
         borderRadius: effectiveRadius,
-        border: border ?? Border.all(color: AppColors.border, width: 1),
+        border: border ?? Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
         boxShadow: effectiveShadows,
       ),
       child: Material(

@@ -59,7 +59,7 @@ class _FitoraWeeklySplitViewState extends State<FitoraWeeklySplitView> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           decoration: BoxDecoration(
             color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(24), // Capsule Strip
             border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
             boxShadow: [
               BoxShadow(
@@ -84,68 +84,69 @@ class _FitoraWeeklySplitViewState extends State<FitoraWeeklySplitView> {
                     });
                   },
                   child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    margin: const EdgeInsets.symmetric(horizontal: 2.5),
+                    padding: const EdgeInsets.symmetric(vertical: 9),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? themeColor.withValues(alpha: 0.12)
+                          ? themeColor
                           : isRest
                               ? const Color(0xFFF1F5F9)
                               : Colors.white,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(999), // Stadium Capsule Shape
                       border: Border.all(
                         color: isSelected
                             ? themeColor
                             : const Color(0xFFE2E8F0),
                         width: isSelected ? 1.6 : 1,
                       ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: themeColor.withValues(alpha: 0.28),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ]
+                          : null,
                     ),
                     child: Column(
                       children: [
                         Text(
                           day.dayOfWeek,
                           style: TextStyle(
-                            color: isSelected ? themeColor : const Color(0xFF475569),
-                            fontSize: 10.5,
+                            color: isSelected
+                                ? Colors.white
+                                : const Color(0xFF475569),
+                            fontSize: 11,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.5,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 5),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
                           decoration: BoxDecoration(
-                            color: isRest
-                                ? const Color(0xFFE2E8F0)
-                                : isSelected
-                                    ? themeColor
+                            color: isSelected
+                                ? Colors.white.withValues(alpha: 0.22)
+                                : isRest
+                                    ? const Color(0xFFE2E8F0)
                                     : const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(999), // Capsule Pill
                           ),
                           child: Text(
                             isRest ? 'REST' : _getShortSplitTag(day.title),
                             style: TextStyle(
-                              color: isRest
-                                  ? const Color(0xFF64748B)
-                                  : isSelected
-                                      ? Colors.white
+                              color: isSelected
+                                  ? Colors.white
+                                  : isRest
+                                      ? const Color(0xFF64748B)
                                       : const Color(0xFF334155),
-                              fontSize: 8,
+                              fontSize: 7.5,
                               fontWeight: FontWeight.w900,
+                              letterSpacing: 0.2,
                             ),
                           ),
                         ),
-                        if (isSelected) ...[
-                          const SizedBox(height: 3),
-                          Container(
-                            width: 4,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: themeColor,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ],
                       ],
                     ),
                   ),

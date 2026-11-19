@@ -194,11 +194,11 @@ class _FitoraAnimatedExerciseDemoState extends State<FitoraAnimatedExerciseDemo>
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24), // Capsule-friendly card
         border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: const Color(0xFF0F172A).withValues(alpha: 0.04),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -209,18 +209,18 @@ class _FitoraAnimatedExerciseDemoState extends State<FitoraAnimatedExerciseDemo>
         children: [
           // 3D ANIMATION SCREEN CONTAINER
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(23)),
             child: Container(
               height: widget.height,
               width: double.infinity,
-              color: const Color(0xFFF8FAFC), // Apple-style pristine light neutral canvas
+              color: const Color(0xFFF8FAFC),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
                   // Real 3D Anatomical Rendered Exercise Looping Motion
                   _buildMediaView(),
 
-                  // TOP OVERLAY: Phase Status Pill & 3D Badge
+                  // TOP OVERLAY: Unified Floating Dynamic Capsule Island
                   Positioned(
                     top: 12,
                     left: 14,
@@ -236,15 +236,15 @@ class _FitoraAnimatedExerciseDemoState extends State<FitoraAnimatedExerciseDemo>
                               final phase = _getMovementPhase(progress);
                               final color = _getPhaseColor(progress, highlightColor);
                               return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.95),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: color.withValues(alpha: 0.5)),
+                                  color: Colors.white.withValues(alpha: 0.96),
+                                  borderRadius: BorderRadius.circular(999), // Stadium Capsule
+                                  border: Border.all(color: color.withValues(alpha: 0.4), width: 1.2),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.black.withValues(alpha: 0.05),
-                                      blurRadius: 6,
+                                      blurRadius: 8,
                                       offset: const Offset(0, 2),
                                     ),
                                   ],
@@ -280,10 +280,10 @@ class _FitoraAnimatedExerciseDemoState extends State<FitoraAnimatedExerciseDemo>
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
                           decoration: BoxDecoration(
                             color: const Color(0xFF0F172A),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(999), // Stadium Capsule
                           ),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
@@ -306,7 +306,7 @@ class _FitoraAnimatedExerciseDemoState extends State<FitoraAnimatedExerciseDemo>
                     ),
                   ),
 
-                  // BOTTOM OVERLAY CONTROLS (Play/Pause, Slow-Mo 0.5x)
+                  // BOTTOM OVERLAY CONTROLS (Capsule Island)
                   if (widget.showControls)
                     Positioned(
                       bottom: 10,
@@ -314,9 +314,9 @@ class _FitoraAnimatedExerciseDemoState extends State<FitoraAnimatedExerciseDemo>
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.9),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          color: Colors.white.withValues(alpha: 0.95),
+                          borderRadius: BorderRadius.circular(999), // Stadium Capsule
+                          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.08),
@@ -330,7 +330,7 @@ class _FitoraAnimatedExerciseDemoState extends State<FitoraAnimatedExerciseDemo>
                           children: [
                             InkWell(
                               onTap: _togglePlayPause,
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(999),
                               child: Padding(
                                 padding: const EdgeInsets.all(5),
                                 child: Icon(
@@ -343,7 +343,7 @@ class _FitoraAnimatedExerciseDemoState extends State<FitoraAnimatedExerciseDemo>
                             Container(width: 1, height: 14, color: const Color(0xFFE2E8F0)),
                             InkWell(
                               onTap: _toggleSpeed,
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(999),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
                                 child: Text(
@@ -368,17 +368,18 @@ class _FitoraAnimatedExerciseDemoState extends State<FitoraAnimatedExerciseDemo>
           // BOTTOM CARD CONTENT: Clean Minimalist Target & Form Info
           if (!widget.isCompact)
             Padding(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: highlightColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(999), // Stadium Capsule
+                          border: Border.all(color: highlightColor.withValues(alpha: 0.25), width: 0.9),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -398,10 +399,11 @@ class _FitoraAnimatedExerciseDemoState extends State<FitoraAnimatedExerciseDemo>
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(999), // Stadium Capsule
+                          border: Border.all(color: const Color(0xFFE2E8F0), width: 0.9),
                         ),
                         child: Text(
                           widget.exercise.equipment.toUpperCase(),

@@ -243,7 +243,7 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
                           color: isSelected ? color : Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(999),
                           border: Border.all(
                             color: isSelected ? color : AppColors.border,
                             width: isSelected ? 1.5 : 1,
@@ -251,7 +251,7 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: color.withValues(alpha: 0.3),
+                                    color: color.withValues(alpha: 0.25),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),
@@ -571,7 +571,8 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: goalColor),
                     foregroundColor: goalColor,
-                    padding: const EdgeInsets.symmetric(vertical: 11),
+                    shape: const StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   child: const Text(
                     'View Weekly Split',
@@ -586,7 +587,9 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: goalColor,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 11),
+                    shape: const StadiumBorder(),
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   child: const Text(
                     'Start Routine',
@@ -643,10 +646,10 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: plan.goalBadgeColor.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(6),
+                                color: plan.goalBadgeColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(999),
                               ),
                               child: Text(
                                 plan.goalDisplayName.toUpperCase(),
@@ -654,6 +657,7 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
                                   color: plan.goalBadgeColor,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.4,
                                 ),
                               ),
                             ),
@@ -662,32 +666,49 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.close_rounded),
-                        onPressed: () => Navigator.pop(ctx),
+                      InkWell(
+                        onTap: () => Navigator.pop(ctx),
+                        borderRadius: BorderRadius.circular(999),
+                        child: Container(
+                          padding: const EdgeInsets.all(7),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF1F5F9),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.close_rounded, size: 18, color: Color(0xFF64748B)),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
-                // Tab Bar: 7-Day Weekly Split vs Session Movements
+                // Tab Bar: 7-Day Weekly Split vs Session Movements (Capsule Dock Style)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
+                    padding: const EdgeInsets.all(3.5),
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceMuted,
-                      borderRadius: BorderRadius.circular(10),
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(999),
                     ),
                     child: TabBar(
                       indicatorSize: TabBarIndicatorSize.tab,
+                      dividerColor: Colors.transparent,
                       indicator: BoxDecoration(
                         color: plan.goalBadgeColor,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(999),
+                        boxShadow: [
+                          BoxShadow(
+                            color: plan.goalBadgeColor.withValues(alpha: 0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       labelColor: Colors.white,
-                      unselectedLabelColor: AppColors.textSecondary,
-                      labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                      unselectedLabelColor: const Color(0xFF64748B),
+                      labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
                       tabs: const [
                         Tab(text: '7-Day Weekly Split'),
                         Tab(text: 'All Movements (3D Scan)'),

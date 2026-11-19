@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
-import '../constants/app_spacing.dart';
 import '../constants/app_typography.dart';
 
 enum FitoraButtonVariant { primary, secondary, outline, text, danger, ghost }
@@ -69,12 +68,12 @@ class FitoraButton extends StatelessWidget {
       child: Material(
         color: isInteractive ? bgColor : AppColors.surfaceMuted,
         shape: RoundedRectangleBorder(
-          borderRadius: AppSpacing.roundedMd,
+          borderRadius: BorderRadius.circular(999), // Capsule Stadium shape
           side: borderSide ?? BorderSide.none,
         ),
         child: InkWell(
           onTap: isInteractive ? onPressed : null,
-          borderRadius: AppSpacing.roundedMd,
+          borderRadius: BorderRadius.circular(999),
           child: Padding(
             padding: padding ?? const EdgeInsets.symmetric(horizontal: 20),
             child: Center(

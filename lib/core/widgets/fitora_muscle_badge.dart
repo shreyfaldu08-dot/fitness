@@ -85,25 +85,25 @@ class FitoraMuscleBadge extends StatelessWidget {
     final icon = getMuscleIcon(muscle);
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: isSecondary ? 6 : 8, vertical: 3),
+      padding: EdgeInsets.symmetric(horizontal: isSecondary ? 8 : 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: isSecondary ? 0.08 : 0.14),
-        borderRadius: BorderRadius.circular(8),
+        color: color.withValues(alpha: isSecondary ? 0.08 : 0.12),
+        borderRadius: BorderRadius.circular(999), // Minimalist Capsule Pill
         border: Border.all(
-          color: color.withValues(alpha: isSecondary ? 0.2 : 0.4),
-          width: 0.8,
+          color: color.withValues(alpha: isSecondary ? 0.25 : 0.4),
+          width: 0.9,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: isSecondary ? 11 : 13, color: color),
+          Icon(icon, size: isSecondary ? 11 : 12.5, color: color),
           const SizedBox(width: 4),
           Text(
             muscle,
             style: AppTypography.labelSmall.copyWith(
               fontSize: isSecondary ? 10 : 11,
-              fontWeight: isSecondary ? FontWeight.normal : FontWeight.bold,
+              fontWeight: isSecondary ? FontWeight.w500 : FontWeight.w700,
               color: color,
             ),
           ),
@@ -149,34 +149,42 @@ class FitoraDifficultyIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          children: List.generate(3, (i) {
-            final filled = i < _level;
-            return Container(
-              margin: const EdgeInsets.only(right: 2),
-              width: 5,
-              height: 10,
-              decoration: BoxDecoration(
-                color: filled ? _color : const Color(0xFFCBD5E1),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            );
-          }),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          difficulty.toUpperCase(),
-          style: AppTypography.labelSmall.copyWith(
-            fontSize: 9.5,
-            fontWeight: FontWeight.w700,
-            color: _color,
-            letterSpacing: 0.3,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+      decoration: BoxDecoration(
+        color: _color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(999), // Capsule Pill
+        border: Border.all(color: _color.withValues(alpha: 0.3), width: 0.9),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: List.generate(3, (i) {
+              final filled = i < _level;
+              return Container(
+                margin: const EdgeInsets.only(right: 2.5),
+                width: 4.5,
+                height: 4.5,
+                decoration: BoxDecoration(
+                  color: filled ? _color : const Color(0xFFCBD5E1),
+                  shape: BoxShape.circle,
+                ),
+              );
+            }),
           ),
-        ),
-      ],
+          const SizedBox(width: 4),
+          Text(
+            difficulty.toUpperCase(),
+            style: TextStyle(
+              fontSize: 9.5,
+              fontWeight: FontWeight.w800,
+              color: _color,
+              letterSpacing: 0.4,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

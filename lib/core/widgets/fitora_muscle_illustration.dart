@@ -122,11 +122,11 @@ class FitoraAnatomyCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24), // Capsule Card
         border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -142,10 +142,10 @@ class FitoraAnatomyCard extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(7),
                     decoration: BoxDecoration(
                       color: highlightColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(8),
+                      shape: BoxShape.circle,
                     ),
                     child: Icon(Icons.track_changes_rounded, size: 16, color: highlightColor),
                   ),
@@ -161,10 +161,10 @@ class FitoraAnatomyCard extends StatelessWidget {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(999), // Stadium Capsule
                 ),
                 child: Text(
                   isBack ? 'POSTERIOR CHAIN' : 'ANTERIOR CHAIN',
@@ -172,7 +172,7 @@ class FitoraAnatomyCard extends StatelessWidget {
                     fontSize: 9.5,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF64748B),
-                    letterSpacing: 0.5,
+                    letterSpacing: 0.4,
                   ),
                 ),
               ),
@@ -180,19 +180,19 @@ class FitoraAnatomyCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // PRIMARY AGONIST (Target Muscle)
+          // PRIMARY AGONIST (Target Muscle Capsule)
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: highlightColor.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
               border: Border.all(color: highlightColor.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
                 Container(
-                  width: 36,
-                  height: 36,
+                  width: 38,
+                  height: 38,
                   decoration: BoxDecoration(
                     color: highlightColor.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
@@ -200,7 +200,7 @@ class FitoraAnatomyCard extends StatelessWidget {
                   child: Icon(
                     FitoraMuscleBadge.getMuscleIcon(primaryMuscle),
                     color: highlightColor,
-                    size: 18,
+                    size: 19,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -211,7 +211,7 @@ class FitoraAnatomyCard extends StatelessWidget {
                       const Text(
                         'PRIMARY TARGET (AGONIST)',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 9.5,
                           fontWeight: FontWeight.w800,
                           color: Color(0xFF64748B),
                           letterSpacing: 0.5,
@@ -221,8 +221,8 @@ class FitoraAnatomyCard extends StatelessWidget {
                       Text(
                         primaryMuscle,
                         style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w800,
                           color: highlightColor,
                         ),
                       ),
@@ -230,10 +230,10 @@ class FitoraAnatomyCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4.5),
                   decoration: BoxDecoration(
                     color: highlightColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(999), // Stadium Pill
                   ),
                   child: Text(
                     '100% Load',
@@ -261,22 +261,22 @@ class FitoraAnatomyCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: 6,
+              runSpacing: 6,
               children: secondaryMuscles.map((muscle) {
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(999), // Stadium Capsule
                     border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        width: 6,
-                        height: 6,
+                        width: 5,
+                        height: 5,
                         decoration: const BoxDecoration(
                           color: Color(0xFF94A3B8),
                           shape: BoxShape.circle,
@@ -286,7 +286,7 @@ class FitoraAnatomyCard extends StatelessWidget {
                       Text(
                         muscle,
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 11.5,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF334155),
                         ),
@@ -299,7 +299,7 @@ class FitoraAnatomyCard extends StatelessWidget {
             const SizedBox(height: 14),
           ],
 
-          // BIOMECHANICAL DETAILS GRID (Equipment, Kinetic Stance, Plane)
+          // BIOMECHANICAL DETAILS GRID (Capsule Pills)
           Row(
             children: [
               Expanded(
@@ -330,10 +330,10 @@ class FitoraAnatomyCard extends StatelessWidget {
     required IconData icon,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(999), // Stadium Capsule Shape
         border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
@@ -343,10 +343,11 @@ class FitoraAnatomyCard extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   label,
-                  style: const TextStyle(fontSize: 9.5, color: Color(0xFF94A3B8)),
+                  style: const TextStyle(fontSize: 8.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.bold),
                 ),
                 Text(
                   value,
